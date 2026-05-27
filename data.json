@@ -1,0 +1,72 @@
+{
+  "personal_info": {
+    "name": "Takudzwa Ashely John",
+    "title": "Software Developer | Computer Systems Engineering Student",
+    "email": "tashely99@gmail.com",
+    "location": "Harare, Zimbabwe",
+    "linkedin": "https://linkedin.com/in/yourprofile",
+    "github": "https://github.com/yourusername",
+    "portfolio": "https://yourportfolio.com"
+  },
+  "skills": {
+    "programming_languages": ["Python", "JavaScript", "SQL", "JAVA"],
+    "frameworks": ["Flask", "React", "Django", "Flutter"],
+    "tools": ["Git", "Docker", "VSCode"],
+    "libraries": ["Pandas", "NumPy", "TensorFlow", "Scikit-learn"],
+    "soft_skills": ["Problem Solving", "Communication", "Teamwork", "Adaptability", "Leadership"]
+  },
+  "experience": [
+    {
+      "company": "OK Zimbabwe Limited",
+      "role": "ICT Intern",
+      "duration": "August 2024 - July 2025",
+      "description": "Worked on various IT projects including system administration and network management.",
+      "achievements": [
+        "Developed an ICT Asset Management System using Python and Django.",
+        "Automated routine internal tasks to improve efficiency."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Midlands State University",
+      "degree": "Bachelor of Science in Computer Systems Engineering",
+      "year": "2026",
+      "gpa": "Expected 1 Honours (First Class)",
+      "achievements": []
+    }
+  ],
+  "projects": [
+    {
+      "name": "CodeGenius Engineers Website",
+      "description": "Corporate website showcasing services and portfolio.",
+      "technologies": ["Python", "Django", "SQLite"],
+      "link": "https://github.com/yourusername/project1"
+    },
+    {
+      "name": "Campus VibeMarket",
+      "description": "E-commerce mobile app for campus trading.",
+      "technologies": ["Flutter", "Dart", "Firebase"],
+      "link": "https://github.com/yourusername/project2"
+    }
+  ],
+  "behavioral_responses": [
+    {
+      "tags": ["challenge", "difficult", "problem", "bug"],
+      "response": "During my internship at OK Zimbabwe, I faced a challenge automating a legacy workflow. I broke the problem down, researched Python automation libraries, and built a tool that saved the team 5 hours per week."
+    },
+    {
+      "tags": ["teamwork", "collaboration", "conflict"],
+      "response": "I believe in open communication. working on the Campus VibeMarket app, we had conflicting ideas on UI design. I organized a user testing session which provided data to make the final decision objectively."
+    },
+    {
+      "tags": ["leadership", "initiative"],
+      "response": "I take initiative by identifying gaps. At university, I often lead study groups and help organize coding resources for my peers in Computer Systems Engineering."
+    }
+  ],
+  "technical_deep_dives": {
+    "python": "I use Python for both data analysis (Pandas) and backend web development (Django/Flask). I focus on writing clean, PEP-8 compliant code.",
+    "django": "My experience with Django includes building the Asset Management System, handling ORM relationships, and implementing user authentication.",
+    "flutter": "I use Flutter for cross-platform mobile development, managing state effectively and integrating with Firebase for backend services."
+  }
+}

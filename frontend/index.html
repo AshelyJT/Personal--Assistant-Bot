@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Resume - {{ personal_info.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ personal_info.name }}</h1>
+            <div class="title">{{ personal_info.title }}</div>
+            <div class="location">{{ personal_info.location }}</div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="welcome-message">
+                    💬 Ask me anything about my experience, skills, education, or projects!
+                </div>
+                <div class="message bot-message">
+                    {{ welcome_message }}
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typing-indicator">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <div class="input-group">
+                <input type="text" id="user-input" placeholder="Ask about my experience, skills, projects..." autocomplete="off">
+                <button id="send-btn">Send</button>
+            </div>
+            <div class="suggestions">
+                <button class="suggestion-btn" data-question="What are your skills?">Skills</button>
+                <button class="suggestion-btn" data-question="Tell me about your experience">Experience</button>
+                <button class="suggestion-btn" data-question="What's your education background?">Education</button>
+                <button class="suggestion-btn" data-question="Show me your projects">Projects</button>
+                <button class="suggestion-btn" data-question="How can I contact you?">Contact</button>
+                <button class="suggestion-btn" data-question="Tell me about yourself">About Me</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
