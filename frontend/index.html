@@ -7,47 +7,102 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <main class="app-shell">
+        <aside class="profile-panel" aria-label="Candidate profile">
+            <div class="avatar" aria-hidden="true">
+                {{ personal_info.name[:1] }}
+            </div>
+            <p class="eyebrow">Interactive Resume Assistant</p>
             <h1>{{ personal_info.name }}</h1>
-            <div class="title">{{ personal_info.title }}</div>
-            <div class="location">{{ personal_info.location }}</div>
-        </div>
-        
-        <div class="chat-container">
-            <div class="chat-messages" id="chat-messages">
-                <div class="welcome-message">
-                    💬 Ask me anything about my experience, skills, education, or projects!
+            <p class="role">{{ personal_info.title }}</p>
+            <p class="location">{{ personal_info.location }}</p>
+
+            <div class="status-row">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span>Available for portfolio review</span>
+            </div>
+
+            <div class="profile-stats" aria-label="Profile highlights">
+                <div>
+                    <strong>4</strong>
+                    <span>Core stacks</span>
                 </div>
-                <div class="message bot-message">
-                    {{ welcome_message }}
+                <div>
+                    <strong>2</strong>
+                    <span>Projects</span>
+                </div>
+                <div>
+                    <strong>2026</strong>
+                    <span>Graduation</span>
                 </div>
             </div>
-            
-            <div class="typing-indicator" id="typing-indicator">
-                <div class="typing-dots">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
+
+            <div class="contact-actions">
+                <a href="mailto:{{ personal_info.email }}">Email</a>
+                <a href="{{ personal_info.github }}" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="{{ personal_info.linkedin }}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            </div>
+        </aside>
+
+        <section class="assistant-panel" aria-label="Chat assistant">
+            <header class="assistant-header">
+                <div>
+                    <p class="eyebrow">AI career bot</p>
+                    <h2>Ask about Takudzwa's experience</h2>
+                </div>
+                <div class="toolbar">
+                    <button type="button" id="clear-chat" class="icon-btn" title="Clear conversation" aria-label="Clear conversation">
+                        Clear
+                    </button>
+                    <button type="button" id="export-chat" class="icon-btn" title="Download transcript" aria-label="Download transcript">
+                        Export
+                    </button>
+                </div>
+            </header>
+
+            <div class="topic-tabs" aria-label="Suggested topics">
+                <button class="topic-btn active" data-question="Tell me about yourself">Overview</button>
+                <button class="topic-btn" data-question="What are your technical skills?">Skills</button>
+                <button class="topic-btn" data-question="Tell me about your internship experience">Experience</button>
+                <button class="topic-btn" data-question="Show me your projects">Projects</button>
+                <button class="topic-btn" data-question="What achievements are you proud of?">Impact</button>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages" aria-live="polite">
+                    <div class="message-row bot-row">
+                        <div class="message-avatar" aria-hidden="true">AI</div>
+                        <article class="message bot-message">
+                            {{ welcome_message }}
+                        </article>
+                    </div>
+                </div>
+
+                <div class="typing-indicator" id="typing-indicator" aria-label="Assistant is typing">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
             </div>
-        </div>
-        
-        <div class="input-container">
-            <div class="input-group">
-                <input type="text" id="user-input" placeholder="Ask about my experience, skills, projects..." autocomplete="off">
-                <button id="send-btn">Send</button>
+
+            <div class="input-container">
+                <div class="suggestions">
+                    <button class="suggestion-btn" data-question="What did you build with Django?">Django work</button>
+                    <button class="suggestion-btn" data-question="Tell me about Campus VibeMarket">Campus VibeMarket</button>
+                    <button class="suggestion-btn" data-question="How did you solve a difficult problem?">Problem solving</button>
+                    <button class="suggestion-btn" data-question="How can I contact you?">Contact</button>
+                </div>
+
+                <form class="composer" id="chat-form">
+                    <textarea id="user-input" rows="1" maxlength="500" placeholder="Ask a focused question about skills, experience, projects, or achievements..." autocomplete="off"></textarea>
+                    <div class="composer-actions">
+                        <span id="char-count">0/500</span>
+                        <button type="submit" id="send-btn">Send</button>
+                    </div>
+                </form>
             </div>
-            <div class="suggestions">
-                <button class="suggestion-btn" data-question="What are your skills?">Skills</button>
-                <button class="suggestion-btn" data-question="Tell me about your experience">Experience</button>
-                <button class="suggestion-btn" data-question="What's your education background?">Education</button>
-                <button class="suggestion-btn" data-question="Show me your projects">Projects</button>
-                <button class="suggestion-btn" data-question="How can I contact you?">Contact</button>
-                <button class="suggestion-btn" data-question="Tell me about yourself">About Me</button>
-            </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>

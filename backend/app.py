@@ -19,12 +19,17 @@ bot = AdvancedPersonalAssistant()
 @app.route('/')
 def home():
     return render_template('index.html', 
-                         personal_info=bot.data['personal_info'],
+                         personal_info=bot.data.get('personal_info', {}),
                          welcome_message="Hello! I am Takudzwa's interactive resume. Ask me about my Python projects or my time at OK Zimbabwe.")
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_message = request.json.get('message', '')
+    payload = request.get_json(silent=True) or {}
+    user_message = payload.get('message', '')
+
+    if not isinstance(user_message, str) or not user_message.strip():
+        return jsonify({'response': 'Please enter a message so I can help.'}), 400
+
     response = bot.get_response(user_message)
     return jsonify({'response': response})
 
