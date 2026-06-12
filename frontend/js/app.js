@@ -8,6 +8,11 @@ class ChatApp {
         this.clearBtn = document.getElementById('clear-chat');
         this.exportBtn = document.getElementById('export-chat');
         this.charCount = document.getElementById('char-count');
+        this.answerInsights = document.getElementById('answer-insights');
+        this.intentLabel = document.getElementById('intent-label');
+        this.confidenceLabel = document.getElementById('confidence-label');
+        this.followups = document.getElementById('followups');
+        this.dynamicLinks = document.getElementById('dynamic-links');
         this.storageKey = 'resumeAssistantTranscript';
         this.messages = [];
         this.isSending = false;
@@ -130,9 +135,10 @@ class ChatApp {
         this.showTyping();
 
         try {
-            const response = await this.fetchBotResponse(message);
+            const answer = await this.fetchBotResponse(message);
             this.hideTyping();
-            this.addMessage(response, 'bot');
+            this.addMessage(answer.response, 'bot');
+            this.renderAnswerMeta(answer);
         } catch (error) {
             console.error('Error:', error);
             this.hideTyping();
@@ -158,7 +164,47 @@ class ChatApp {
             throw new Error(data.response || 'Network response was not ok');
         }
 
-        return data.response;
+        return data;
+    }
+
+    renderAnswerMeta(answer) {
+        this.answerInsights.hidden = false;
+        this.intentLabel.textContent = `Intent: ${answer.intent || 'unknown'}`;
+        this.confidenceLabel.textContent = `Confidence: ${Math.round((answer.confidence || 0) * 100)}%`;
+
+        this.renderFollowups(answer.suggestions || []);
+        this.renderLinks(answer.links || []);
+    }
+
+    renderFollowups(suggestions) {
+        this.followups.innerHTML = '';
+        this.followups.hidden = suggestions.length === 0;
+
+        suggestions.forEach((suggestion) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'followup-btn';
+            button.textContent = suggestion;
+            button.addEventListener('click', () => {
+                this.userInput.value = suggestion;
+                this.sendMessage();
+            });
+            this.followups.appendChild(button);
+        });
+    }
+
+    renderLinks(links) {
+        this.dynamicLinks.innerHTML = '';
+        this.dynamicLinks.hidden = links.length === 0;
+
+        links.forEach((link) => {
+            const anchor = document.createElement('a');
+            anchor.href = link.url;
+            anchor.target = '_blank';
+            anchor.rel = 'noopener noreferrer';
+            anchor.textContent = link.label;
+            this.dynamicLinks.appendChild(anchor);
+        });
     }
 
     saveTranscript() {
@@ -181,6 +227,9 @@ class ChatApp {
         this.messages = [];
         localStorage.removeItem(this.storageKey);
         this.chatMessages.querySelectorAll('.message-row:not(:first-child)').forEach((row) => row.remove());
+        this.answerInsights.hidden = true;
+        this.followups.hidden = true;
+        this.dynamicLinks.hidden = true;
     }
 
     exportTranscript() {

@@ -395,6 +395,47 @@ button {
     margin-bottom: 12px;
 }
 
+.answer-insights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.answer-insights span {
+    padding: 6px 9px;
+    color: #475467;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.dynamic-links,
+.followups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.dynamic-links a,
+.followup-btn {
+    padding: 8px 11px;
+    color: var(--accent-dark);
+    background: var(--accent-soft);
+    border: 1px solid #9ddbd2;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.followup-btn {
+    cursor: pointer;
+}
+
 .suggestion-btn {
     padding: 8px 11px;
     color: #475467;

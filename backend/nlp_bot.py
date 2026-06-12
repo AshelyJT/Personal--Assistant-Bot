@@ -13,6 +13,7 @@ class AdvancedPersonalAssistant:
         self.load_data(data_file)
         self.nlp = self.load_nlp_model()
         self.context = {"last_intent": None}
+        self.last_confidence = 0.0
         self.setup_knowledge_base()
 
     def load_data(self, filepath):
@@ -60,6 +61,7 @@ class AdvancedPersonalAssistant:
         tokens = set(re.findall(r"[a-z0-9]+", text))
 
         if any(t in text for t in ["python", "django", "flutter", "react"]):
+            self.last_confidence = 0.92
             return "technical"
 
         priority_intents = [
@@ -73,12 +75,15 @@ class AdvancedPersonalAssistant:
         ]
         for intent in priority_intents:
             if any(keyword in text for keyword in self.intents[intent]):
+                self.last_confidence = 0.9
                 return intent
 
         if tokens.intersection({"hello", "hi", "hey", "greetings"}):
+            self.last_confidence = 0.88
             return "greeting"
 
         if any(keyword in text for keyword in self.intents["about"]):
+            self.last_confidence = 0.86
             return "about"
 
         if self.nlp:
@@ -94,14 +99,18 @@ class AdvancedPersonalAssistant:
                         best_intent = intent
 
                 if highest_score > 0.55:
+                    self.last_confidence = round(highest_score, 2)
                     return best_intent
 
         for intent, keywords in self.intents.items():
             if intent == "greeting" and tokens.intersection({"hello", "hi", "hey", "greetings"}):
+                self.last_confidence = 0.78
                 return intent
             if intent != "greeting" and any(keyword in text for keyword in keywords):
+                self.last_confidence = 0.74
                 return intent
 
+        self.last_confidence = 0.0
         return None
 
     def get_personal_info(self):
@@ -113,6 +122,77 @@ class AdvancedPersonalAssistant:
     def get_first_item(self, section):
         items = self.data.get(section, [])
         return items[0] if items else {}
+
+    def is_public_link(self, url):
+        if not url:
+            return False
+
+        placeholder_parts = ["yourprofile", "yourusername", "yourportfolio", "project1", "project2"]
+        return not any(part in url.lower() for part in placeholder_parts)
+
+    def get_public_links(self):
+        personal_info = self.get_personal_info()
+        links = []
+
+        for label in ["portfolio", "github", "linkedin"]:
+            url = personal_info.get(label)
+            if self.is_public_link(url):
+                links.append({"label": label.title(), "url": url})
+
+        resume_url = personal_info.get("resume")
+        if self.is_public_link(resume_url):
+            links.append({"label": "Resume", "url": resume_url})
+
+        return links
+
+    def get_suggestions(self, intent):
+        suggestions = {
+            "about": [
+                "What are your strongest technical skills?",
+                "Tell me about your internship experience",
+                "Show me your projects",
+            ],
+            "skills": [
+                "What did you build with Django?",
+                "How have you used Python?",
+                "Tell me about your tools and libraries",
+            ],
+            "experience": [
+                "What achievements are you proud of?",
+                "How did you solve a difficult problem?",
+                "What did you automate?",
+            ],
+            "projects": [
+                "Tell me about Campus VibeMarket",
+                "Tell me about CodeGenius Engineers Website",
+                "What technologies did you use?",
+            ],
+            "achievements": [
+                "Tell me about your internship experience",
+                "How did you solve a difficult problem?",
+                "What did you build with Django?",
+            ],
+            "contact": [
+                "Show me your projects",
+                "Tell me about yourself",
+                "What are your skills?",
+            ],
+            "fallback": [
+                "Tell me about yourself",
+                "Show me your projects",
+                "How can I contact you?",
+            ],
+        }
+
+        return suggestions.get(intent, suggestions["fallback"])
+
+    def get_profile_metrics(self):
+        skills = self.get_skills()
+        return {
+            "languages": len(skills.get("programming_languages", [])),
+            "projects": len(self.data.get("projects", [])),
+            "experience_items": len(self.data.get("experience", [])),
+        }
 
     def format_projects(self, query=""):
         projects = self.data.get("projects", [])
@@ -133,6 +213,14 @@ class AdvancedPersonalAssistant:
             technologies = ", ".join(project.get("technologies", [])) or "various technologies"
             link = project.get("link")
             summary = f"**{name}**\n{description}\nStack: {technologies}."
+            if project.get("role"):
+                summary += f"\nRole: {project['role']}"
+            if project.get("impact"):
+                summary += f"\nImpact: {project['impact']}"
+            if project.get("challenge"):
+                summary += f"\nChallenge: {project['challenge']}"
+            if project.get("features"):
+                summary += "\nFeatures:\n" + "\n".join(f"- {feature}" for feature in project["features"])
             if link:
                 summary += f"\nLink: {link}"
             project_summaries.append(summary)
@@ -241,3 +329,18 @@ class AdvancedPersonalAssistant:
             return "I can discuss my technical depth in Python, Django, React, or Flutter. Which one interests you?"
 
         return "I'm not sure I understand. Try asking about my **Skills**, **Projects**, or **Education**."
+
+    def get_answer(self, user_input):
+        response = self.get_response(user_input)
+        intent = self.context.get("last_intent") or "fallback"
+
+        if response.startswith("I'm not sure") or response.startswith("Please ask"):
+            intent = "fallback"
+
+        return {
+            "response": response,
+            "intent": intent,
+            "confidence": self.last_confidence,
+            "suggestions": self.get_suggestions(intent),
+            "links": self.get_public_links() if intent in {"about", "contact", "projects"} else [],
+        }

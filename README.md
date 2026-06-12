@@ -25,6 +25,16 @@ python run.py
 
 Open `http://127.0.0.1:5000` in your browser.
 
+## Test
+
+```powershell
+python -m unittest discover
+```
+
+## Profile Data
+
+Update `data.json` with your real LinkedIn, GitHub, portfolio, resume, and project links before sharing the bot publicly. Placeholder links are intentionally hidden from the app's public link sections.
+
 ## Example Questions
 
 - What are your skills?

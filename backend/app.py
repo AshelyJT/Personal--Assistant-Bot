@@ -20,6 +20,8 @@ bot = AdvancedPersonalAssistant()
 def home():
     return render_template('index.html', 
                          personal_info=bot.data.get('personal_info', {}),
+                         metrics=bot.get_profile_metrics(),
+                         public_links=bot.get_public_links(),
                          welcome_message="Hello! I am Takudzwa's interactive resume. Ask me about my Python projects or my time at OK Zimbabwe.")
 
 @app.route('/chat', methods=['POST'])
@@ -30,8 +32,11 @@ def chat():
     if not isinstance(user_message, str) or not user_message.strip():
         return jsonify({'response': 'Please enter a message so I can help.'}), 400
 
-    response = bot.get_response(user_message)
-    return jsonify({'response': response})
+    answer = bot.get_answer(user_message)
+    if answer.get('intent') == 'fallback':
+        app.logger.info("Fallback question: %s", user_message)
+
+    return jsonify(answer)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

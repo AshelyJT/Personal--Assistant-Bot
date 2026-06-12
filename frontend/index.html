@@ -24,11 +24,11 @@
 
             <div class="profile-stats" aria-label="Profile highlights">
                 <div>
-                    <strong>4</strong>
+                    <strong>{{ metrics.languages }}</strong>
                     <span>Core stacks</span>
                 </div>
                 <div>
-                    <strong>2</strong>
+                    <strong>{{ metrics.projects }}</strong>
                     <span>Projects</span>
                 </div>
                 <div>
@@ -39,8 +39,9 @@
 
             <div class="contact-actions">
                 <a href="mailto:{{ personal_info.email }}">Email</a>
-                <a href="{{ personal_info.github }}" target="_blank" rel="noopener noreferrer">GitHub</a>
-                <a href="{{ personal_info.linkedin }}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                {% for link in public_links %}
+                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>
+                {% endfor %}
             </div>
         </aside>
 
@@ -86,6 +87,14 @@
             </div>
 
             <div class="input-container">
+                <div class="answer-insights" id="answer-insights" hidden>
+                    <span id="intent-label">Intent: overview</span>
+                    <span id="confidence-label">Confidence: --</span>
+                </div>
+
+                <div class="dynamic-links" id="dynamic-links" hidden></div>
+                <div class="followups" id="followups" hidden></div>
+
                 <div class="suggestions">
                     <button class="suggestion-btn" data-question="What did you build with Django?">Django work</button>
                     <button class="suggestion-btn" data-question="Tell me about Campus VibeMarket">Campus VibeMarket</button>

@@ -6,7 +6,8 @@
     "location": "Harare, Zimbabwe",
     "linkedin": "https://linkedin.com/in/yourprofile",
     "github": "https://github.com/yourusername",
-    "portfolio": "https://yourportfolio.com"
+    "portfolio": "https://yourportfolio.com",
+    "resume": ""
   },
   "skills": {
     "programming_languages": ["Python", "JavaScript", "SQL", "JAVA"],
@@ -41,12 +42,28 @@
       "name": "CodeGenius Engineers Website",
       "description": "Corporate website showcasing services and portfolio.",
       "technologies": ["Python", "Django", "SQLite"],
+      "role": "Backend and full-stack developer",
+      "features": [
+        "Service and portfolio pages",
+        "Django-powered content structure",
+        "SQLite-backed development database"
+      ],
+      "impact": "Created a professional web presence for an engineering-focused brand.",
+      "challenge": "Organizing business information into a clean, maintainable website structure.",
       "link": "https://github.com/yourusername/project1"
     },
     {
       "name": "Campus VibeMarket",
       "description": "E-commerce mobile app for campus trading.",
       "technologies": ["Flutter", "Dart", "Firebase"],
+      "role": "Mobile app developer",
+      "features": [
+        "Campus marketplace listing flow",
+        "Cross-platform mobile UI",
+        "Firebase-backed app services"
+      ],
+      "impact": "Designed to make student-to-student buying and selling easier on campus.",
+      "challenge": "Balancing a simple mobile experience with enough structure for marketplace trust.",
       "link": "https://github.com/yourusername/project2"
     }
   ],
