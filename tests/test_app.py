@@ -15,6 +15,19 @@ class ChatEndpointTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Interactive Resume Assistant", response.data)
+        self.assertIn(b"Ask My Assistant", response.data)
+        self.assertIn(b'id="assistant-drawer"', response.data)
+        self.assertIn(b"/profile-assets/style.css", response.data)
+
+    def test_portfolio_assets_and_resume_are_served(self):
+        stylesheet = self.client.get("/profile-assets/style.css")
+        portrait = self.client.get("/profile-assets/images/me.jpg")
+        resume = self.client.get("/resume")
+
+        self.assertEqual(stylesheet.status_code, 200)
+        self.assertEqual(portrait.status_code, 200)
+        self.assertEqual(resume.status_code, 200)
+        self.assertEqual(resume.mimetype, "application/pdf")
 
     def test_chat_returns_structured_answer(self):
         response = self.post_chat("What are your technical skills?")

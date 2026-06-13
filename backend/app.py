@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import os
 import sys
 
@@ -8,8 +8,9 @@ from nlp_bot import AdvancedPersonalAssistant
 
 # Setup Flask with correct template folder paths
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-template_dir = os.path.join(base_dir, 'frontend')
+template_dir = base_dir
 static_dir = os.path.join(base_dir, 'frontend')
+profile_dir = os.path.join(base_dir, 'profile')
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
@@ -18,11 +19,24 @@ bot = AdvancedPersonalAssistant()
 
 @app.route('/')
 def home():
-    return render_template('index.html', 
+    return render_template('profile/index.html',
                          personal_info=bot.data.get('personal_info', {}),
                          metrics=bot.get_profile_metrics(),
                          public_links=bot.get_public_links(),
                          welcome_message="Hello! I am Takudzwa's interactive resume. Ask me about my Python projects or my time at OK Zimbabwe.")
+
+@app.route('/profile-assets/<path:filename>')
+def profile_asset(filename):
+    return send_from_directory(profile_dir, filename)
+
+@app.route('/resume')
+def resume():
+    return send_from_directory(
+        profile_dir,
+        'Takudzwa John CV.pdf',
+        as_attachment=True,
+        download_name='Takudzwa-Ashely-John-CV.pdf',
+    )
 
 @app.route('/chat', methods=['POST'])
 def chat():

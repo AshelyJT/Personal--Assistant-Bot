@@ -1,6 +1,6 @@
-# Personal Assistant Bot
+# Portfolio and Personal Assistant
 
-A Flask-based interactive resume chatbot for answering questions about skills, experience, education, projects, contact details, and interview-style examples.
+A Flask-powered personal portfolio with an integrated resume chatbot for answering questions about skills, experience, education, projects, contact details, and interview-style examples.
 
 ## Setup
 
@@ -25,10 +25,14 @@ python run.py
 
 Open `http://127.0.0.1:5000` in your browser.
 
+The portfolio is the main page. Use any **Ask My Assistant** button to open the
+chat drawer without leaving the portfolio.
+
 ## Deploy
 
-This project needs a Python web service because Flask serves both the website and
-the `/chat` API. Netlify can build Python dependencies, but it does not run
+This project needs a Python web service because Flask serves the portfolio,
+profile assets, downloadable CV, and the `/chat` API. Netlify can build Python
+dependencies, but it does not run
 `python run.py` as a persistent web server.
 
 The repository includes a Render Blueprint in `render.yaml`. To deploy:
@@ -53,7 +57,9 @@ python -m unittest discover
 
 ## Profile Data
 
-Update `data.json` with your real LinkedIn, GitHub, portfolio, resume, and project links before sharing the bot publicly. Placeholder links are intentionally hidden from the app's public link sections.
+The portfolio source and assets live in `profile/`. Assistant knowledge lives in
+`data.json`; keep it aligned with visible portfolio projects and contact details.
+Placeholder links are intentionally hidden from assistant responses.
 
 ## Example Questions
 

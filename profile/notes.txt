@@ -1,0 +1,190 @@
+Sidemenu BG Color - #ff006280
+
+.projects{
+    /* background-color: #000043; */
+    scroll-margin-top: 6rem;
+    margin-bottom: 3em;
+}
+
+.projects h2{
+    font-size: 3rem;
+    font-weight: normal;
+    text-align: center;
+}
+
+.projects-container{
+    display: flex;
+    justify-content: center;
+    margin: 0.5em; 
+    overflow: hidden;
+}
+
+.prev-button, .next-button{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1.5px solid var(--FORECOLOR);
+}
+
+.prev-button:hover, .next-button:hover{
+    cursor: pointer;
+    background-color: transparent;
+    color: var(--FONT-COLOR);
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+    }
+
+.project-card{
+    background-color: rgba(0, 221, 255, 0.15);
+    margin: 1rem;
+    width: 275px;
+    height: 400px;
+    border: 2px solid var(--FORECOLOR);
+    border-radius: 1rem;
+    display: grid;
+    grid-template-rows: 1fr 4fr 1fr 1fr;
+    z-index: 1;
+}
+
+.project-card-header{
+    font-size: 1.5rem;
+    font-weight: normal;
+    font-style: normal;
+}
+
+.upper-section{
+    border-bottom:2px solid var(--FORECOLOR);
+}
+
+.middle-section{
+    padding: 1em; 
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.lower-section{
+    border-top:2px solid var(--FORECOLOR);
+}
+
+.project-p{
+    text-align: justify;
+    color: #fff;
+}
+
+
+.carousel {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+    overflow: hidden;
+    background-color: red;
+    height: 100px;
+}
+
+.carousel-inner {
+    display: flex;
+    transition: transform 0.5s ease;
+    background-color: green;
+}
+
+.carousel-item {
+    min-width: 100%;
+    box-sizing: border-box;
+}
+
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.projects{
+    /* background-color: #000043; */
+    scroll-margin-top: 6rem;
+    margin-bottom: 3em;
+}
+
+.projects h2{
+    font-size: 3rem;
+    font-weight: normal;
+    text-align: center;
+}
+
+.carousel {
+    width: 100%;
+    max-width: 1000px;
+    overflow: hidden;
+    background-color: red;
+}
+
+.cards{
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.project-card {
+    background-color: rgba(0, 221, 255, 0.15);
+    margin: 1rem;
+    min-width: 275px;
+    height: 400px;
+    border: 2px solid var(--FORECOLOR);
+    border-radius: 1rem;
+    display: grid;
+    grid-template-rows: 1fr 4fr 1fr 1fr;
+    z-index: 1;
+}
+
+.carousel-control {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+    }

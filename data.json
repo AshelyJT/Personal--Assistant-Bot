@@ -5,15 +5,15 @@
     "email": "tashely99@gmail.com",
     "phone_numbers": ["0786530315", "0712723622"],
     "location": "Harare, Zimbabwe",
-    "linkedin": "https://linkedin.com/in/yourprofile",
+    "linkedin": "https://www.linkedin.com/in/takudzwa-ashely-john-334b182b5/",
     "github": "https://github.com/yourusername",
     "portfolio": "https://yourportfolio.com",
     "resume": ""
   },
   "skills": {
-    "programming_languages": ["Python", "JavaScript", "SQL", "JAVA"],
-    "frameworks": ["Flask", "React", "Django", "Flutter"],
-    "tools": ["Git", "Docker", "VSCode"],
+    "programming_languages": ["Python", "JavaScript", "SQL", "Java", "Dart"],
+    "frameworks": ["Flask", "Django", "React", "Flutter", "Bootstrap"],
+    "tools": ["Git", "GitHub", "Docker", "VSCode", "ESP32", "MQTT"],
     "libraries": ["Pandas", "NumPy", "TensorFlow", "Scikit-learn"],
     "soft_skills": ["Problem Solving", "Communication", "Teamwork", "Adaptability", "Leadership"]
   },
@@ -40,18 +40,46 @@
   ],
   "projects": [
     {
-      "name": "CodeGenius Engineers Website",
-      "description": "Corporate website showcasing services and portfolio.",
-      "technologies": ["Python", "Django", "SQLite"],
-      "role": "Backend and full-stack developer",
+      "name": "SmartShelf AI Pricing System",
+      "description": "AI-driven dynamic pricing and digital shelf display system",
+      "technologies": ["Python", "Django", "ESP32", "MQTT", "SQLite", "Machine Learning"],
+      "role": "Full-stack and IoT developer",
       "features": [
-        "Service and portfolio pages",
-        "Django-powered content structure",
-        "SQLite-backed development database"
+        "AI-assisted product pricing",
+        "MQTT communication between Django and ESP32 devices",
+        "Digital shelf price displays"
+      ],
+      "impact": "Connected software, machine learning, and embedded hardware in a practical retail prototype.",
+      "challenge": "Keeping web application data and physical shelf displays synchronized.",
+      "link": ""
+    },
+    {
+      "name": "CodeGenius Engineers Website",
+      "description": "Responsive business website showcasing digital services and portfolio work.",
+      "technologies": ["HTML", "CSS", "JavaScript", "Bootstrap"],
+      "role": "Front-end web developer",
+      "features": [
+        "Responsive service and portfolio pages",
+        "Mobile-friendly navigation",
+        "Clear contact and business information"
       ],
       "impact": "Created a professional web presence for an engineering-focused brand.",
       "challenge": "Organizing business information into a clean, maintainable website structure.",
       "link": "https://github.com/yourusername/project1"
+    },
+    {
+      "name": "Web Portfolio",
+      "description": "Personal responsive portfolio showcasing skills, projects, services, and contact information.",
+      "technologies": ["HTML", "CSS", "JavaScript", "Flask"],
+      "role": "Designer and full-stack developer",
+      "features": [
+        "Responsive portfolio sections",
+        "Accessible navigation and contact experience",
+        "Integrated personal assistant"
+      ],
+      "impact": "Brought my professional profile and interactive resume assistant into one experience.",
+      "challenge": "Combining a content-rich portfolio with a focused conversational interface.",
+      "link": ""
     },
     {
       "name": "Campus VibeMarket",
