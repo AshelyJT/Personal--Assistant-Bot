@@ -7,25 +7,35 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <button type="button" class="sidebar-backdrop" id="sidebar-backdrop" aria-label="Close profile sidebar" tabindex="-1"></button>
+
     <main class="app-shell">
-        <aside class="profile-panel" aria-label="Candidate profile">
-            <div class="avatar" aria-hidden="true">
-                {{ personal_info.name[:1] }}
-            </div>
-            <p class="eyebrow">Interactive Resume Assistant</p>
-            <h1>{{ personal_info.name }}</h1>
-            <p class="role">{{ personal_info.title }}</p>
-            <p class="location">{{ personal_info.location }}</p>
-
-            <div class="status-row">
-                <span class="status-dot" aria-hidden="true"></span>
-                <span>Available for portfolio review</span>
+        <aside class="profile-panel" id="profile-panel" aria-label="Candidate profile">
+            <div class="profile-topline">
+                <div class="brand-mark" aria-hidden="true">{{ personal_info.name[:1] }}</div>
+                <span>Interactive Resume Assistant</span>
+                <button type="button" class="sidebar-close" id="sidebar-close" aria-label="Close profile sidebar">&times;</button>
             </div>
 
+            <div class="profile-identity">
+                <p class="eyebrow">Meet the candidate</p>
+                <h1>{{ personal_info.name }}</h1>
+                <p class="role">{{ personal_info.title }}</p>
+            </div>
+
+            <div class="profile-summary">
+                <p class="location">
+                    <span aria-hidden="true">&#9679;</span>
+                    {{ personal_info.location }}
+                </p>
+                <p class="availability">Open to opportunities</p>
+            </div>
+
+            <p class="sidebar-label">At a glance</p>
             <div class="profile-stats" aria-label="Profile highlights">
                 <div>
                     <strong>{{ metrics.languages }}</strong>
-                    <span>Core stacks</span>
+                    <span>Languages</span>
                 </div>
                 <div>
                     <strong>{{ metrics.projects }}</strong>
@@ -37,45 +47,75 @@
                 </div>
             </div>
 
+            <p class="sidebar-label">Get in touch</p>
             <div class="contact-actions">
-                <a href="mailto:{{ personal_info.email }}">Email</a>
+                <a class="primary-contact" href="mailto:{{ personal_info.email }}">
+                    <span>Email me</span>
+                    <span aria-hidden="true">&#8599;</span>
+                </a>
                 {% for link in public_links %}
-                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>
+                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+                    <span>{{ link.label }}</span>
+                    <span aria-hidden="true">&#8599;</span>
+                </a>
                 {% endfor %}
+            </div>
+
+            <div class="sidebar-help">
+                <strong>Not sure what to ask?</strong>
+                <p>Try skills, projects, work experience, education, or contact details.</p>
             </div>
         </aside>
 
         <section class="assistant-panel" aria-label="Chat assistant">
             <header class="assistant-header">
-                <div>
-                    <p class="eyebrow">AI career bot</p>
-                    <h2>Ask about Takudzwa's experience</h2>
+                <div class="assistant-title">
+                    <button type="button" class="profile-toggle" id="profile-toggle" aria-controls="profile-panel" aria-expanded="false">
+                        <span aria-hidden="true">{{ personal_info.name[:1] }}</span>
+                        About
+                    </button>
+                    <div>
+                        <h2>Career Assistant</h2>
+                        <p class="assistant-subtitle">Ask anything about {{ personal_info.name }}</p>
+                    </div>
                 </div>
                 <div class="toolbar">
-                    <button type="button" id="clear-chat" class="icon-btn" title="Clear conversation" aria-label="Clear conversation">
-                        Clear
+                    <button type="button" id="clear-chat" class="icon-btn" title="Start a new conversation" aria-label="Start a new conversation">
+                        <span aria-hidden="true">+</span>
+                        New chat
                     </button>
                     <button type="button" id="export-chat" class="icon-btn" title="Download transcript" aria-label="Download transcript">
+                        <span aria-hidden="true">&#8595;</span>
                         Export
                     </button>
                 </div>
             </header>
 
-            <div class="topic-tabs" aria-label="Suggested topics">
-                <button class="topic-btn active" data-question="Tell me about yourself">Overview</button>
-                <button class="topic-btn" data-question="What are your technical skills?">Skills</button>
-                <button class="topic-btn" data-question="Tell me about your internship experience">Experience</button>
-                <button class="topic-btn" data-question="Show me your projects">Projects</button>
-                <button class="topic-btn" data-question="What achievements are you proud of?">Impact</button>
-            </div>
-
             <div class="chat-container">
                 <div class="chat-messages" id="chat-messages" aria-live="polite">
-                    <div class="message-row bot-row">
-                        <div class="message-avatar" aria-hidden="true">AI</div>
-                        <article class="message bot-message">
-                            {{ welcome_message }}
-                        </article>
+                    <div class="welcome-screen">
+                        <div class="welcome-logo" aria-hidden="true">{{ personal_info.name[:1] }}</div>
+                        <h3>How can I help you learn about {{ personal_info.name }}?</h3>
+                        <p>{{ welcome_message }}</p>
+
+                        <div class="starter-grid" aria-label="Example questions">
+                            <button data-question="Tell me about yourself">
+                                <strong>About me</strong>
+                                <span>Get a quick professional introduction</span>
+                            </button>
+                            <button data-question="What are your technical skills?">
+                                <strong>Skills</strong>
+                                <span>Explore languages, frameworks and tools</span>
+                            </button>
+                            <button data-question="Show me your projects">
+                                <strong>Projects</strong>
+                                <span>See what I have designed and built</span>
+                            </button>
+                            <button data-question="Tell me about your internship experience">
+                                <strong>Experience</strong>
+                                <span>Learn about my practical work history</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -87,28 +127,16 @@
             </div>
 
             <div class="input-container">
-                <div class="answer-insights" id="answer-insights" hidden>
-                    <span id="intent-label">Intent: overview</span>
-                    <span id="confidence-label">Confidence: --</span>
-                </div>
-
                 <div class="dynamic-links" id="dynamic-links" hidden></div>
                 <div class="followups" id="followups" hidden></div>
 
-                <div class="suggestions">
-                    <button class="suggestion-btn" data-question="What did you build with Django?">Django work</button>
-                    <button class="suggestion-btn" data-question="Tell me about Campus VibeMarket">Campus VibeMarket</button>
-                    <button class="suggestion-btn" data-question="How did you solve a difficult problem?">Problem solving</button>
-                    <button class="suggestion-btn" data-question="How can I contact you?">Contact</button>
-                </div>
-
                 <form class="composer" id="chat-form">
-                    <textarea id="user-input" rows="1" maxlength="500" placeholder="Ask a focused question about skills, experience, projects, or achievements..." autocomplete="off"></textarea>
-                    <div class="composer-actions">
-                        <span id="char-count">0/500</span>
-                        <button type="submit" id="send-btn">Send</button>
-                    </div>
+                    <textarea id="user-input" rows="1" maxlength="500" placeholder="Message the career assistant" autocomplete="off" aria-label="Your question"></textarea>
+                    <button type="submit" id="send-btn" aria-label="Send message">
+                        <span aria-hidden="true">&#8593;</span>
+                    </button>
                 </form>
+                <p class="composer-note"><span id="char-count">0/500</span> &middot; Answers are based on the candidate's portfolio information.</p>
             </div>
         </section>
     </main>

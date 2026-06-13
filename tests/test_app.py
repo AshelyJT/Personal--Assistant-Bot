@@ -34,6 +34,15 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(payload["intent"], "projects")
         self.assertIn("Campus VibeMarket", payload["response"])
+        self.assertNotIn("Stack:", payload["response"])
+        self.assertNotIn("Role:", payload["response"])
+
+    def test_skills_response_is_conversational(self):
+        response = self.post_chat("What are your technical skills?")
+        payload = response.get_json()
+
+        self.assertIn("My strongest language", payload["response"])
+        self.assertNotIn("Languages:", payload["response"])
 
     def test_empty_message_is_rejected(self):
         response = self.post_chat("")

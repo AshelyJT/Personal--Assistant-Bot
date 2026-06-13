@@ -207,25 +207,39 @@ class AdvancedPersonalAssistant:
         selected_projects = filtered_projects or projects
 
         project_summaries = []
-        for project in selected_projects[:3]:
+        for project in selected_projects[:2]:
             name = project.get("name", "Project")
-            description = project.get("description", "a software project")
+            description = project.get("description", "software project").rstrip(".").lower()
+            article = "an" if description.startswith(("a", "e", "i", "o", "u")) else "a"
             technologies = ", ".join(project.get("technologies", [])) or "various technologies"
             link = project.get("link")
-            summary = f"**{name}**\n{description}\nStack: {technologies}."
-            if project.get("role"):
-                summary += f"\nRole: {project['role']}"
+            role = project.get("role")
+            summary = f"**{name}**\n{name} is {article} {description}. "
+            if role:
+                summary += f"I worked on it as the {role.lower()}, "
+            else:
+                summary += "I built it "
+            summary += f"using **{technologies}**."
+
             if project.get("impact"):
-                summary += f"\nImpact: {project['impact']}"
-            if project.get("challenge"):
-                summary += f"\nChallenge: {project['challenge']}"
+                impact = project["impact"].rstrip(".")
+                if impact.lower().startswith("designed "):
+                    summary += f"\n\nThe project was {impact.lower()}."
+                else:
+                    summary += f"\n\nThe project {impact[0].lower() + impact[1:]}."
+
             if project.get("features"):
-                summary += "\nFeatures:\n" + "\n".join(f"- {feature}" for feature in project["features"])
-            if link:
-                summary += f"\nLink: {link}"
+                summary += "\n\nSome of the key parts I worked on were:\n" + "\n".join(
+                    f"- {feature}" for feature in project["features"][:3]
+                )
+            if link and self.is_public_link(link):
+                summary += f"\n\nYou can view the project here: {link}"
             project_summaries.append(summary)
 
-        return "\n".join(project_summaries)
+        if len(project_summaries) == 1:
+            return project_summaries[0]
+
+        return "Here are two projects that show the kind of work I enjoy:\n\n" + "\n\n".join(project_summaries)
 
     def format_achievements(self):
         achievements = []
@@ -237,7 +251,7 @@ class AdvancedPersonalAssistant:
         if not achievements:
             return "I do not have achievements listed yet."
 
-        return "**Key achievements:**\n" + "\n".join(achievements)
+        return "A couple of achievements I am especially proud of are:\n\n" + "\n".join(achievements)
 
     def get_response(self, user_input):
         if not user_input or not user_input.strip():
@@ -264,19 +278,32 @@ class AdvancedPersonalAssistant:
             name = personal_info.get("name", "Takudzwa")
             title = personal_info.get("title", "Software Developer")
             location = personal_info.get("location", "Zimbabwe")
-            return f"**{name}** is a {title} based in {location}, with interests in backend development, NLP, mobile apps, and practical software systems."
+            return (
+                f"I'm **{name}**, a {title} based in {location}. "
+                "I enjoy turning practical problems into useful software, especially through "
+                "backend development, mobile apps, and intelligent systems."
+            )
 
         if intent == "skills":
             skills = self.get_skills()
-            langs = ", ".join(skills.get("programming_languages", [])) or "Python and JavaScript"
+            languages = [
+                language.title() if language.upper() == "JAVA" else language
+                for language in skills.get("programming_languages", [])
+                if language.lower() != "python"
+            ]
+            langs = ", ".join(languages) or "JavaScript and SQL"
             frameworks = ", ".join(skills.get("frameworks", [])) or "Flask, Django, React, and Flutter"
             tools = ", ".join(skills.get("tools", []))
             libraries = ", ".join(skills.get("libraries", []))
-            response = f"**Technical skills**\nLanguages: {langs}\nFrameworks: {frameworks}"
+            response = (
+                f"My strongest language is **Python**, and I also work with {langs}. "
+                f"For application development, I use **{frameworks}** depending on whether "
+                "the project is web, backend, or mobile."
+            )
             if libraries:
-                response += f"\nLibraries: {libraries}"
+                response += f"\n\nI have also used {libraries} for data and machine-learning work."
             if tools:
-                response += f"\nTools: {tools}"
+                response += f" My regular development tools include {tools}."
             return response
 
         if intent == "experience":
@@ -284,9 +311,19 @@ class AdvancedPersonalAssistant:
             if not role:
                 return "I do not have experience details available yet."
             achievements = role.get("achievements", [])
-            response = f"**{role.get('role', 'ICT Intern')}** at **{role.get('company', 'OK Zimbabwe Limited')}**\nDuration: {role.get('duration', 'Not specified')}\n{role.get('description', '')}"
+            description = role.get("description", "").strip()
+            if description.lower().startswith("worked "):
+                description = f"I {description[0].lower() + description[1:]}"
+            response = (
+                f"I worked as an **{role.get('role', 'ICT Intern')}** at "
+                f"**{role.get('company', 'OK Zimbabwe Limited')}** from "
+                f"{role.get('duration', 'the listed period')}. "
+                f"During that time, {description}"
+            )
             if achievements:
-                response += "\nHighlights:\n" + "\n".join(f"- {achievement}" for achievement in achievements)
+                response += "\n\nTwo highlights from that experience were:\n" + "\n".join(
+                    f"- {achievement}" for achievement in achievements
+                )
             return response
 
         if intent == "projects":
@@ -306,26 +343,26 @@ class AdvancedPersonalAssistant:
             linkedin = personal_info.get("linkedin")
             github = personal_info.get("github")
             links = [f"You can email me at **{email}**."]
-            if linkedin:
-                links.append(f"LinkedIn: {linkedin}")
-            if github:
-                links.append(f"GitHub: {github}")
-            return "\n".join(links)
+            if self.is_public_link(linkedin):
+                links.append(f"You can also find me on LinkedIn: {linkedin}")
+            if self.is_public_link(github):
+                links.append(f"My code is available on GitHub: {github}")
+            return "\n\n".join(links)
 
         if intent == "behavioral":
             stories = self.data.get("behavioral_responses", [])
             for story in stories:
                 if any(tag in text for tag in story.get("tags", [])):
-                    return f"**Situation:** {story.get('response', '')}"
+                    return f"Here is one example: {story.get('response', '')}"
             if stories:
-                return f"**Example:** {stories[0].get('response', '')}"
+                return f"Here is one example: {stories[0].get('response', '')}"
             return "I do not have behavioral examples available yet."
 
         if intent == "technical":
             deep_dives = self.data.get("technical_deep_dives", {})
             for tech, deep_dive in deep_dives.items():
                 if tech in text:
-                    return f"**{tech.title()} Experience:** {deep_dive}"
+                    return f"When it comes to **{tech.title()}**, {deep_dive[0].lower() + deep_dive[1:]}"
             return "I can discuss my technical depth in Python, Django, React, or Flutter. Which one interests you?"
 
         return "I'm not sure I understand. Try asking about my **Skills**, **Projects**, or **Education**."

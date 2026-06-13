@@ -7,10 +7,10 @@ class ChatApp {
         this.typingIndicator = document.getElementById('typing-indicator');
         this.clearBtn = document.getElementById('clear-chat');
         this.exportBtn = document.getElementById('export-chat');
+        this.profileToggle = document.getElementById('profile-toggle');
+        this.sidebarClose = document.getElementById('sidebar-close');
+        this.sidebarBackdrop = document.getElementById('sidebar-backdrop');
         this.charCount = document.getElementById('char-count');
-        this.answerInsights = document.getElementById('answer-insights');
-        this.intentLabel = document.getElementById('intent-label');
-        this.confidenceLabel = document.getElementById('confidence-label');
         this.followups = document.getElementById('followups');
         this.dynamicLinks = document.getElementById('dynamic-links');
         this.storageKey = 'resumeAssistantTranscript';
@@ -47,6 +47,13 @@ class ChatApp {
 
         this.clearBtn.addEventListener('click', () => this.clearTranscript());
         this.exportBtn.addEventListener('click', () => this.exportTranscript());
+        this.profileToggle.addEventListener('click', () => this.setProfileSidebar(true));
+        this.sidebarClose.addEventListener('click', () => this.setProfileSidebar(false));
+        this.sidebarBackdrop.addEventListener('click', () => this.setProfileSidebar(false));
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') this.setProfileSidebar(false);
+        });
 
         document.querySelectorAll('[data-question]').forEach((button) => {
             button.addEventListener('click', () => {
@@ -57,28 +64,39 @@ class ChatApp {
         });
     }
 
+    setProfileSidebar(isOpen) {
+        document.body.classList.toggle('profile-open', isOpen);
+        this.profileToggle.setAttribute('aria-expanded', String(isOpen));
+        this.sidebarBackdrop.tabIndex = isOpen ? 0 : -1;
+
+        if (isOpen) {
+            this.sidebarClose.focus();
+        } else if (document.activeElement === this.sidebarClose || document.activeElement === this.sidebarBackdrop) {
+            this.profileToggle.focus();
+        }
+    }
+
     addMessage(message, sender = 'bot', shouldPersist = true) {
+        this.chatMessages.classList.add('chat-active');
+
         const row = document.createElement('div');
         row.className = `message-row ${sender === 'user' ? 'user-row' : 'bot-row'}`;
 
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
-        avatar.textContent = sender === 'user' ? 'You' : 'AI';
+        const avatarLabel = document.createElement('span');
+        avatarLabel.textContent = sender === 'user' ? 'You' : 'AI';
+        avatar.appendChild(avatarLabel);
 
         const bubble = document.createElement('article');
         bubble.className = `message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
         bubble.innerHTML = sender === 'user' ? escapeHtml(message) : formatMessage(message);
 
-        const meta = document.createElement('footer');
-        meta.className = 'message-meta';
-        meta.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        bubble.appendChild(meta);
-
         if (sender === 'bot') {
             const copyButton = document.createElement('button');
             copyButton.type = 'button';
             copyButton.className = 'copy-btn';
-            copyButton.textContent = 'Copy';
+            copyButton.innerHTML = '<span aria-hidden="true">&#9634;</span> Copy';
             copyButton.addEventListener('click', () => this.copyMessage(message, copyButton));
             bubble.appendChild(copyButton);
         }
@@ -138,7 +156,8 @@ class ChatApp {
             const answer = await this.fetchBotResponse(message);
             this.hideTyping();
             this.addMessage(answer.response, 'bot');
-            this.renderAnswerMeta(answer);
+            this.renderFollowups(answer.suggestions || []);
+            this.renderLinks(answer.links || []);
         } catch (error) {
             console.error('Error:', error);
             this.hideTyping();
@@ -165,15 +184,6 @@ class ChatApp {
         }
 
         return data;
-    }
-
-    renderAnswerMeta(answer) {
-        this.answerInsights.hidden = false;
-        this.intentLabel.textContent = `Intent: ${answer.intent || 'unknown'}`;
-        this.confidenceLabel.textContent = `Confidence: ${Math.round((answer.confidence || 0) * 100)}%`;
-
-        this.renderFollowups(answer.suggestions || []);
-        this.renderLinks(answer.links || []);
     }
 
     renderFollowups(suggestions) {
@@ -226,8 +236,8 @@ class ChatApp {
     clearTranscript() {
         this.messages = [];
         localStorage.removeItem(this.storageKey);
-        this.chatMessages.querySelectorAll('.message-row:not(:first-child)').forEach((row) => row.remove());
-        this.answerInsights.hidden = true;
+        this.chatMessages.querySelectorAll('.message-row').forEach((row) => row.remove());
+        this.chatMessages.classList.remove('chat-active');
         this.followups.hidden = true;
         this.dynamicLinks.hidden = true;
     }
@@ -248,9 +258,9 @@ class ChatApp {
     async copyMessage(message, button) {
         try {
             await navigator.clipboard.writeText(message);
-            button.textContent = 'Copied';
+            button.innerHTML = '<span aria-hidden="true">&#10003;</span> Copied';
             setTimeout(() => {
-                button.textContent = 'Copy';
+                button.innerHTML = '<span aria-hidden="true">&#9634;</span> Copy';
             }, 1400);
         } catch (error) {
             button.textContent = 'Copy failed';
@@ -268,11 +278,59 @@ function escapeHtml(text) {
 }
 
 function formatMessage(text) {
+    const lines = text.split(/\r?\n/);
+    const blocks = [];
+    let listItems = [];
+
+    const flushList = () => {
+        if (!listItems.length) return;
+        blocks.push(`<ul class="response-list">${listItems.join('')}</ul>`);
+        listItems = [];
+    };
+
+    lines.forEach((rawLine) => {
+        const line = rawLine.trim();
+
+        if (!line) {
+            flushList();
+            return;
+        }
+
+        if (line.startsWith('- ')) {
+            listItems.push(`<li>${formatInline(line.slice(2))}</li>`);
+            return;
+        }
+
+        flushList();
+
+        const heading = line.match(/^\*\*(.+?)\*\*$/);
+        if (heading) {
+            blocks.push(`<h4 class="response-heading">${formatInline(heading[1])}</h4>`);
+            return;
+        }
+
+        const labelledDetail = line.match(/^([A-Za-z][A-Za-z ]{1,24}):\s*(.+)$/);
+        if (labelledDetail) {
+            blocks.push(
+                `<p class="response-detail"><strong>${escapeHtml(labelledDetail[1])}:</strong> ${formatInline(labelledDetail[2])}</p>`
+            );
+            return;
+        }
+
+        blocks.push(`<p class="response-paragraph">${formatInline(line)}</p>`);
+    });
+
+    flushList();
+    return `<div class="response-content">${blocks.join('')}</div>`;
+}
+
+function formatInline(text) {
     return escapeHtml(text)
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^- (.*)$/gm, '<span class="list-item">$1</span>')
-        .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
-        .replace(/\n/g, '<br>');
+        .replace(
+            /(https?:\/\/[^\s<]+)/g,
+            '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+        );
 }
 
 document.addEventListener('DOMContentLoaded', () => {
