@@ -55,6 +55,7 @@ class ChatEndpointTestCase(unittest.TestCase):
         response = self.client.get("/")
         html = response.get_data(as_text=True)
         script = self.client.get("/main.js").get_data(as_text=True)
+        stylesheet = self.client.get("/style.css").get_data(as_text=True)
 
         self.assertIn("Ashely JT Assistant", html)
         self.assertIn("Starting Ashely JT Assistant...", html)
@@ -67,6 +68,13 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("`${ASSISTANT_API_BASE_URL}/chat`", script)
         self.assertIn("ASSISTANT_HEALTH_RETRY_MS", script)
         self.assertIn("while (Date.now() < deadline)", script)
+        self.assertIn("ASSISTANT_TYPEWRITER_WORD_DELAY_MS", script)
+        self.assertIn("await typeAssistantResponse(typingMessage, answer.response)", script)
+        self.assertIn("document.createTreeWalker", script)
+        self.assertNotIn("typingMessage.remove()", script)
+        self.assertIn('grid-template-areas:', stylesheet)
+        self.assertIn('grid-area: suggestions;', stylesheet)
+        self.assertIn('.assistant-bubble.is-generating::after', stylesheet)
         self.assertIn(
             "The assistant is taking longer than usual. You can wait a moment or try again.",
             script,

@@ -1048,6 +1048,12 @@ a {
     height: 100dvh;
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+    grid-template-areas:
+        "header"
+        "status"
+        "messages"
+        "suggestions"
+        "composer";
     background: #f8fbfc;
     color: #17202a;
     border-left: 1px solid rgba(25, 220, 230, 0.25);
@@ -1063,6 +1069,7 @@ a {
 }
 
 .assistant-drawer-header {
+    grid-area: header;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -1107,6 +1114,7 @@ a {
 }
 
 .assistant-wake-status {
+    grid-area: status;
     margin: 1rem 1rem 0;
     display: flex;
     align-items: flex-start;
@@ -1171,6 +1179,7 @@ a {
 }
 
 .assistant-messages {
+    grid-area: messages;
     min-height: 0;
     padding: 1.2rem;
     overflow-y: auto;
@@ -1225,6 +1234,22 @@ a {
     border-radius: 1rem 0.35rem 1rem 1rem;
 }
 
+.assistant-bubble.is-generating::after {
+    content: "";
+    width: 0.45rem;
+    height: 1em;
+    display: inline-block;
+    margin-left: 0.2rem;
+    background: #0f766e;
+    border-radius: 2px;
+    vertical-align: -0.15em;
+    animation: assistantCursorBlink 0.8s steps(1) infinite;
+}
+
+@keyframes assistantCursorBlink {
+    50% { opacity: 0; }
+}
+
 .assistant-response {
     display: grid;
     gap: 0.7rem;
@@ -1273,6 +1298,8 @@ a {
 }
 
 .assistant-suggestions {
+    grid-area: suggestions;
+    align-items: center;
     display: flex;
     gap: 0.45rem;
     padding: 0.65rem 1rem 0;
@@ -1281,6 +1308,8 @@ a {
 
 .assistant-suggestions button {
     flex: 0 0 auto;
+    min-height: 2.5rem;
+    height: auto;
     padding: 0.5rem 0.75rem;
     background: #eef3f5;
     color: #384550;
@@ -1291,6 +1320,7 @@ a {
 }
 
 .assistant-composer {
+    grid-area: composer;
     margin: 0.75rem 1rem 1rem;
     display: flex;
     align-items: flex-end;

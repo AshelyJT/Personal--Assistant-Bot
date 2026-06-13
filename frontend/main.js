@@ -152,6 +152,7 @@ const ASSISTANT_API_BASE_URL = "https://personal-assistant-bot-y2ye.onrender.com
 const ASSISTANT_HEALTH_TIMEOUT_MS = 75000;
 const ASSISTANT_HEALTH_RETRY_MS = 3000;
 const ASSISTANT_HEALTH_REQUEST_TIMEOUT_MS = 10000;
+const ASSISTANT_TYPEWRITER_WORD_DELAY_MS = 45;
 const ASSISTANT_WAKE_MESSAGES = [
     "The assistant is waking up. This may take a moment.",
     "Connecting to the assistant service...",
@@ -259,19 +260,17 @@ async function sendAssistantMessage() {
             body: JSON.stringify({ message })
         });
         const answer = await response.json();
-        typingMessage.remove();
 
         if (!response.ok) {
             throw new Error(answer.response || "The assistant could not answer.");
         }
 
-        appendAssistantMessage(answer.response, "ai");
+        await typeAssistantResponse(typingMessage, answer.response);
         renderAssistantSuggestions(answer.suggestions || []);
     } catch (error) {
-        typingMessage.remove();
-        appendAssistantMessage(
+        await typeAssistantResponse(
+            typingMessage,
             error.message || "Sorry, I could not reach the assistant. Please try again.",
-            "ai"
         );
     } finally {
         assistantBusy = false;
@@ -442,6 +441,53 @@ function appendAssistantTyping() {
     assistantMessages.appendChild(row);
     assistantMessages.scrollTop = assistantMessages.scrollHeight;
     return row;
+}
+
+async function typeAssistantResponse(row, message) {
+    const bubble = row?.querySelector(".assistant-bubble");
+    if (!bubble) return;
+
+    bubble.innerHTML = formatAssistantResponse(message);
+
+    if (reducedMotion) {
+        assistantMessages.scrollTop = assistantMessages.scrollHeight;
+        return;
+    }
+
+    const textNodes = [];
+    const walker = document.createTreeWalker(
+        bubble,
+        NodeFilter.SHOW_TEXT
+    );
+
+    while (walker.nextNode()) {
+        const node = walker.currentNode;
+        const tokens = node.textContent.match(/\S+\s*/g) || [];
+        if (tokens.length) {
+            textNodes.push({ node, tokens });
+            node.textContent = "";
+        }
+    }
+
+    bubble.classList.add("is-generating");
+    bubble.setAttribute("aria-busy", "true");
+
+    for (const { node, tokens } of textNodes) {
+        for (const token of tokens) {
+            node.textContent += token;
+            assistantMessages.scrollTop = assistantMessages.scrollHeight;
+            await waitForAssistantTypewriter();
+        }
+    }
+
+    bubble.classList.remove("is-generating");
+    bubble.removeAttribute("aria-busy");
+}
+
+function waitForAssistantTypewriter() {
+    return new Promise((resolve) => {
+        window.setTimeout(resolve, ASSISTANT_TYPEWRITER_WORD_DELAY_MS);
+    });
 }
 
 function renderAssistantSuggestions(suggestions) {
