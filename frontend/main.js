@@ -148,6 +148,17 @@ document.addEventListener("keydown", (event) => {
 const currentYear = document.getElementById("currentYear");
 if (currentYear) currentYear.textContent = new Date().getFullYear();
 
+const ASSISTANT_API_BASE_URL = "https://personal-assistant-bot-y2ye.onrender.com";
+const ASSISTANT_HEALTH_TIMEOUT_MS = 75000;
+const ASSISTANT_HEALTH_RETRY_MS = 3000;
+const ASSISTANT_HEALTH_REQUEST_TIMEOUT_MS = 10000;
+const ASSISTANT_WAKE_MESSAGES = [
+    "The assistant is waking up. This may take a moment.",
+    "Connecting to the assistant service...",
+    "Loading portfolio knowledge and project details...",
+    "Almost ready. Thank you for waiting..."
+];
+
 const assistantDrawer = document.getElementById("assistant-drawer");
 const assistantBackdrop = document.getElementById("assistant-backdrop");
 const assistantLauncher = document.getElementById("assistant-launcher");
@@ -156,7 +167,14 @@ const assistantMessages = document.getElementById("assistant-messages");
 const assistantForm = document.getElementById("assistant-form");
 const assistantInput = document.getElementById("assistant-input");
 const assistantSend = document.getElementById("assistant-send");
+const assistantWakeStatus = document.getElementById("assistant-wake-status");
+const assistantWakeTitle = document.getElementById("assistant-wake-title");
+const assistantWakeMessage = document.getElementById("assistant-wake-message");
+const assistantRetry = document.getElementById("assistant-retry");
 let assistantBusy = false;
+let assistantHealthState = "idle";
+let assistantHealthPromise = null;
+let assistantWakeMessageTimer = null;
 
 function setAssistantState(isOpen) {
     if (!assistantDrawer || !assistantBackdrop || !assistantLauncher) return;
@@ -170,7 +188,7 @@ function setAssistantState(isOpen) {
 
     if (isOpen) {
         setMenuState(false);
-        assistantInput?.focus();
+        void ensureAssistantReady();
     } else {
         assistantLauncher.focus();
     }
@@ -182,6 +200,10 @@ document.querySelectorAll("[data-open-assistant]").forEach((button) => {
 
 assistantClose?.addEventListener("click", () => setAssistantState(false));
 assistantBackdrop?.addEventListener("click", () => setAssistantState(false));
+assistantRetry?.addEventListener("click", () => {
+    assistantHealthState = "idle";
+    void ensureAssistantReady();
+});
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && assistantDrawer?.classList.contains("is-open")) {
@@ -216,7 +238,12 @@ assistantForm?.addEventListener("submit", (event) => {
 
 async function sendAssistantMessage() {
     const message = assistantInput?.value.trim();
-    if (!message || assistantBusy || !assistantMessages) return;
+    if (
+        !message
+        || assistantBusy
+        || assistantHealthState !== "ready"
+        || !assistantMessages
+    ) return;
 
     assistantBusy = true;
     assistantSend.disabled = true;
@@ -226,7 +253,7 @@ async function sendAssistantMessage() {
     const typingMessage = appendAssistantTyping();
 
     try {
-        const response = await fetch("/chat", {
+        const response = await fetch(`${ASSISTANT_API_BASE_URL}/chat`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message })
@@ -251,6 +278,133 @@ async function sendAssistantMessage() {
         assistantSend.disabled = false;
         assistantInput.focus();
     }
+}
+
+async function ensureAssistantReady() {
+    if (assistantHealthState === "ready") {
+        setAssistantAvailability(true);
+        assistantInput?.focus();
+        return true;
+    }
+
+    if (assistantHealthPromise) return assistantHealthPromise;
+
+    assistantHealthState = "checking";
+    setAssistantAvailability(false);
+    showAssistantWakeStatus();
+    startAssistantWakeMessages();
+
+    assistantHealthPromise = checkAssistantHealth()
+        .then(() => {
+            assistantHealthState = "ready";
+            stopAssistantWakeMessages();
+            hideAssistantWakeStatus();
+            setAssistantAvailability(true);
+            assistantInput?.focus();
+            return true;
+        })
+        .catch(() => {
+            assistantHealthState = "delayed";
+            stopAssistantWakeMessages();
+            showAssistantDelayedStatus();
+            setAssistantAvailability(false);
+            return false;
+        })
+        .finally(() => {
+            assistantHealthPromise = null;
+        });
+
+    return assistantHealthPromise;
+}
+
+async function checkAssistantHealth() {
+    const deadline = Date.now() + ASSISTANT_HEALTH_TIMEOUT_MS;
+
+    while (Date.now() < deadline) {
+        const controller = new AbortController();
+        const requestTimeout = window.setTimeout(
+            () => controller.abort(),
+            ASSISTANT_HEALTH_REQUEST_TIMEOUT_MS
+        );
+
+        try {
+            const response = await fetch(`${ASSISTANT_API_BASE_URL}/health`, {
+                method: "GET",
+                cache: "no-store",
+                signal: controller.signal
+            });
+
+            if (response.ok) return;
+        } catch {
+            // Render may reject early requests while a free service is starting.
+        } finally {
+            window.clearTimeout(requestTimeout);
+        }
+
+        const remainingTime = deadline - Date.now();
+        if (remainingTime > 0) {
+            await waitForAssistantHealthRetry(
+                Math.min(ASSISTANT_HEALTH_RETRY_MS, remainingTime)
+            );
+        }
+    }
+
+    throw new Error("Assistant health check timed out");
+}
+
+function waitForAssistantHealthRetry(delay) {
+    return new Promise((resolve) => window.setTimeout(resolve, delay));
+}
+
+function setAssistantAvailability(isAvailable) {
+    if (assistantInput) assistantInput.disabled = !isAvailable;
+    if (assistantSend) assistantSend.disabled = !isAvailable || assistantBusy;
+
+    document.querySelectorAll("[data-assistant-question]").forEach((button) => {
+        button.disabled = !isAvailable;
+    });
+}
+
+function showAssistantWakeStatus() {
+    if (!assistantWakeStatus || !assistantWakeTitle || !assistantWakeMessage) return;
+
+    assistantWakeStatus.hidden = false;
+    assistantWakeStatus.classList.remove("is-delayed");
+    assistantWakeTitle.textContent = "Starting Ashely JT Assistant...";
+    assistantWakeMessage.textContent = ASSISTANT_WAKE_MESSAGES[0];
+    if (assistantRetry) assistantRetry.hidden = true;
+}
+
+function hideAssistantWakeStatus() {
+    if (assistantWakeStatus) assistantWakeStatus.hidden = true;
+}
+
+function showAssistantDelayedStatus() {
+    if (!assistantWakeStatus || !assistantWakeTitle || !assistantWakeMessage) return;
+
+    assistantWakeStatus.hidden = false;
+    assistantWakeStatus.classList.add("is-delayed");
+    assistantWakeTitle.textContent = "Still connecting";
+    assistantWakeMessage.textContent = "The assistant is taking longer than usual. You can wait a moment or try again.";
+    if (assistantRetry) assistantRetry.hidden = false;
+}
+
+function startAssistantWakeMessages() {
+    stopAssistantWakeMessages();
+    let messageIndex = 0;
+
+    assistantWakeMessageTimer = window.setInterval(() => {
+        messageIndex = (messageIndex + 1) % ASSISTANT_WAKE_MESSAGES.length;
+        if (assistantWakeMessage) {
+            assistantWakeMessage.textContent = ASSISTANT_WAKE_MESSAGES[messageIndex];
+        }
+    }, 3500);
+}
+
+function stopAssistantWakeMessages() {
+    if (!assistantWakeMessageTimer) return;
+    window.clearInterval(assistantWakeMessageTimer);
+    assistantWakeMessageTimer = null;
 }
 
 function appendAssistantMessage(message, sender) {

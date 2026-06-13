@@ -1,42 +1,38 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory
 import os
-import sys
 
-# Allow import from current directory
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from nlp_bot import AdvancedPersonalAssistant
+try:
+    from .nlp_bot import AdvancedPersonalAssistant
+except ImportError:
+    from nlp_bot import AdvancedPersonalAssistant
 
-# Setup Flask with correct template folder paths
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-template_dir = base_dir
-static_dir = os.path.join(base_dir, 'frontend')
-profile_dir = os.path.join(base_dir, 'profile')
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+project_dir = os.path.dirname(backend_dir)
+frontend_dir = os.path.join(project_dir, "frontend")
 
-app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+app = Flask(__name__, static_folder=frontend_dir, static_url_path="")
 
 # Initialize Bot
 bot = AdvancedPersonalAssistant()
 
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return response
+
+
 @app.route('/')
 def home():
-    return render_template('profile/index.html',
-                         personal_info=bot.data.get('personal_info', {}),
-                         metrics=bot.get_profile_metrics(),
-                         public_links=bot.get_public_links(),
-                         welcome_message="Hello! I am Takudzwa's interactive resume. Ask me about my Python projects or my time at OK Zimbabwe.")
+    return send_from_directory(frontend_dir, "index.html")
 
-@app.route('/profile-assets/<path:filename>')
-def profile_asset(filename):
-    return send_from_directory(profile_dir, filename)
 
-@app.route('/resume')
-def resume():
-    return send_from_directory(
-        profile_dir,
-        'Takudzwa John CV.pdf',
-        as_attachment=True,
-        download_name='Takudzwa-Ashely-John-CV.pdf',
-    )
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({'status': 'ok'})
+
 
 @app.route('/chat', methods=['POST'])
 def chat():

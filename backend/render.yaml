@@ -5,4 +5,4 @@ services:
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn run:app
-    healthCheckPath: /
+    healthCheckPath: /health

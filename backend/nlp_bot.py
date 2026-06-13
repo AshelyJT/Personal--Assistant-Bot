@@ -7,8 +7,8 @@ import spacy
 
 class AdvancedPersonalAssistant:
     def __init__(self):
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        data_file = os.path.join(base_dir, "data.json")
+        backend_dir = os.path.dirname(os.path.abspath(__file__))
+        data_file = os.path.join(backend_dir, "data.json")
 
         self.load_data(data_file)
         self.nlp = self.load_nlp_model()
