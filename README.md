@@ -35,15 +35,21 @@ profile assets, downloadable CV, and the `/chat` API. Netlify can build Python
 dependencies, but it does not run
 `python backend/run.py` as a persistent web server.
 
-The backend includes a Render Blueprint in `backend/render.yaml`. To deploy:
+The repository includes a Render Blueprint in `render.yaml`. It configures
+Render to use `backend` as the service root, install the backend requirements,
+and use Python 3.11. To deploy:
 
 1. Push the repository to GitHub.
-2. Configure Render to use `backend` as the root directory.
+2. In Render, create or sync the Blueprint from the repository.
 3. Render installs `backend/requirements.txt` and starts the app with:
 
 ```text
 gunicorn run:app
 ```
+
+For an existing manually configured Render service, set **Root Directory** to
+`backend`. Keep the build command as `pip install -r requirements.txt` and the
+start command as `gunicorn run:app`.
 
 Locally, continue using `python backend\run.py`. In production, Gunicorn imports
 the Flask application named `app` from `backend/run.py`.
