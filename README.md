@@ -25,6 +25,26 @@ python run.py
 
 Open `http://127.0.0.1:5000` in your browser.
 
+## Deploy
+
+This project needs a Python web service because Flask serves both the website and
+the `/chat` API. Netlify can build Python dependencies, but it does not run
+`python run.py` as a persistent web server.
+
+The repository includes a Render Blueprint in `render.yaml`. To deploy:
+
+1. Push the repository to GitHub.
+2. In Render, create a new Blueprint and select the repository.
+3. Render installs `requirements.txt` and starts the app with:
+
+```text
+gunicorn run:app
+```
+
+Locally, continue using `python run.py`. In production, Gunicorn imports the
+Flask application named `app` from `run.py` and listens on Render's assigned
+port.
+
 ## Test
 
 ```powershell
