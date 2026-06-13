@@ -17,48 +17,60 @@
                 <button type="button" class="sidebar-close" id="sidebar-close" aria-label="Close profile sidebar">&times;</button>
             </div>
 
-            <div class="profile-identity">
-                <p class="eyebrow">Meet the candidate</p>
-                <h1>{{ personal_info.name }}</h1>
-                <p class="role">{{ personal_info.title }}</p>
-            </div>
-
-            <div class="profile-summary">
-                <p class="location">
-                    <span aria-hidden="true">&#9679;</span>
-                    {{ personal_info.location }}
-                </p>
-                <p class="availability">Open to opportunities</p>
-            </div>
-
-            <p class="sidebar-label">At a glance</p>
-            <div class="profile-stats" aria-label="Profile highlights">
-                <div>
-                    <strong>{{ metrics.languages }}</strong>
-                    <span>Languages</span>
+            <div class="sidebar-section profile-section">
+                <div class="profile-identity">
+                    <p class="eyebrow">Meet the candidate</p>
+                    <h1>{{ personal_info.name }}</h1>
+                    <p class="role">{{ personal_info.title }}</p>
                 </div>
-                <div>
-                    <strong>{{ metrics.projects }}</strong>
-                    <span>Projects</span>
-                </div>
-                <div>
-                    <strong>2026</strong>
-                    <span>Graduation</span>
+
+                <div class="profile-summary">
+                    <p class="location">
+                        <span aria-hidden="true">&#9679;</span>
+                        {{ personal_info.location }}
+                    </p>
+                    <p class="availability">Open to opportunities</p>
                 </div>
             </div>
 
-            <p class="sidebar-label">Get in touch</p>
-            <div class="contact-actions">
-                <a class="primary-contact" href="mailto:{{ personal_info.email }}">
-                    <span>Email me</span>
-                    <span aria-hidden="true">&#8599;</span>
-                </a>
-                {% for link in public_links %}
-                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
-                    <span>{{ link.label }}</span>
-                    <span aria-hidden="true">&#8599;</span>
-                </a>
-                {% endfor %}
+            <div class="sidebar-section">
+                <p class="sidebar-label">At a glance</p>
+                <div class="profile-stats" aria-label="Profile highlights">
+                    <div>
+                        <strong>{{ metrics.languages }}</strong>
+                        <span>Languages</span>
+                    </div>
+                    <div>
+                        <strong>{{ metrics.projects }}</strong>
+                        <span>Projects</span>
+                    </div>
+                    <div>
+                        <strong>2026</strong>
+                        <span>Graduation</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <p class="sidebar-label">Get in touch</p>
+                <div class="contact-actions">
+                    <a class="primary-contact" href="mailto:{{ personal_info.email }}">
+                        <span>Email me</span>
+                        <span aria-hidden="true">&#8599;</span>
+                    </a>
+                    {% for phone in personal_info.phone_numbers %}
+                    <a href="tel:{{ phone }}">
+                        <span>{{ phone }}</span>
+                        <span aria-hidden="true">&#9742;</span>
+                    </a>
+                    {% endfor %}
+                    {% for link in public_links %}
+                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+                        <span>{{ link.label }}</span>
+                        <span aria-hidden="true">&#8599;</span>
+                    </a>
+                    {% endfor %}
+                </div>
             </div>
 
             <div class="sidebar-help">

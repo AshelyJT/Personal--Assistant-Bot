@@ -44,6 +44,23 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("My strongest language", payload["response"])
         self.assertNotIn("Languages:", payload["response"])
 
+    def test_problem_solving_question_returns_behavioral_story(self):
+        response = self.post_chat("How did you solve a difficult problem?")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "behavioral")
+        self.assertIn("legacy workflow", payload["response"])
+        self.assertNotIn("based in Harare", payload["response"])
+
+    def test_contact_response_includes_phone_numbers(self):
+        response = self.post_chat("How can I contact you?")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("0786530315", payload["response"])
+        self.assertIn("0712723622", payload["response"])
+
     def test_empty_message_is_rejected(self):
         response = self.post_chat("")
         payload = response.get_json()

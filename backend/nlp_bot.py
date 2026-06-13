@@ -47,7 +47,17 @@ class AdvancedPersonalAssistant:
             "projects": ["projects", "portfolio", "apps", "github", "website", "codegenius", "vibemarket"],
             "contact": ["contact", "email", "linkedin", "reach", "phone"],
             "achievements": ["achievement", "achievements", "accomplishment", "impact", "built", "automated"],
-            "behavioral": ["challenge", "mistake", "leadership", "teamwork", "conflict", "proud"],
+            "behavioral": [
+                "challenge",
+                "difficult",
+                "problem",
+                "solve",
+                "mistake",
+                "leadership",
+                "teamwork",
+                "conflict",
+                "proud",
+            ],
             "technical": ["architecture", "coding style", "deep dive", "specifics"],
         }
 
@@ -340,9 +350,12 @@ class AdvancedPersonalAssistant:
 
         if intent == "contact":
             email = personal_info.get("email", "No email listed")
+            phone_numbers = personal_info.get("phone_numbers", [])
             linkedin = personal_info.get("linkedin")
             github = personal_info.get("github")
             links = [f"You can email me at **{email}**."]
+            if phone_numbers:
+                links.append(f"You can also call me on **{' or '.join(phone_numbers)}**.")
             if self.is_public_link(linkedin):
                 links.append(f"You can also find me on LinkedIn: {linkedin}")
             if self.is_public_link(github):
