@@ -103,6 +103,10 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("ASSISTANT_TYPEWRITER_WORD_DELAY_MS", script)
         self.assertIn("await typeAssistantResponse(typingMessage, answer.response)", script)
         self.assertIn("document.createTreeWalker", script)
+        self.assertIn("isAssistantNearBottom()", script)
+        self.assertIn('block.hidden = true', script)
+        self.assertIn('block.hidden = false', script)
+        self.assertNotIn("selected_projects[:2]", open("backend/nlp_bot.py", encoding="utf-8").read())
         self.assertNotIn("typingMessage.remove()", script)
         self.assertIn("const isReady = await ensureAssistantReady()", script)
         self.assertIn("await sendAssistantMessage()", script)
@@ -158,6 +162,22 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("Machine Learning", payload["response"])
         self.assertNotIn("Stack:", payload["response"])
         self.assertNotIn("Role:", payload["response"])
+
+    def test_general_project_question_returns_all_projects(self):
+        response = self.post_chat("Show me your projects")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "projects")
+        self.assertIn("Here are all 5 projects", payload["response"])
+        for project in (
+            "SmartShelf AI",
+            "AI Personal Assistant Chatbot",
+            "ICT Asset Management System",
+            "Portfolio Website",
+            "Creatificant",
+        ):
+            self.assertIn(project, payload["response"])
 
     def test_chatbot_question_returns_project_details(self):
         response = self.post_chat("Tell me about the AI Personal Assistant Chatbot")

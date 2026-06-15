@@ -446,45 +446,82 @@ function appendAssistantTyping() {
     return row;
 }
 
+function isAssistantNearBottom() {
+    if (!assistantMessages) return false;
+
+    const remainingScroll = (
+        assistantMessages.scrollHeight
+        - assistantMessages.scrollTop
+        - assistantMessages.clientHeight
+    );
+    return remainingScroll < 80;
+}
+
+function scrollAssistantToBottom() {
+    if (!assistantMessages) return;
+    assistantMessages.scrollTop = assistantMessages.scrollHeight;
+}
+
 async function typeAssistantResponse(row, message) {
     const bubble = row?.querySelector(".assistant-bubble");
     if (!bubble) return;
 
+    let shouldFollowResponse = isAssistantNearBottom();
     bubble.innerHTML = formatAssistantResponse(message);
 
     if (reducedMotion) {
-        assistantMessages.scrollTop = assistantMessages.scrollHeight;
+        if (shouldFollowResponse) scrollAssistantToBottom();
         return;
     }
 
-    const textNodes = [];
-    const walker = document.createTreeWalker(
-        bubble,
-        NodeFilter.SHOW_TEXT
-    );
+    const responseBlocks = Array.from(bubble.querySelectorAll(
+        ".assistant-response > :not(ul), .assistant-response > ul > li"
+    ));
+    const blocks = responseBlocks.length ? responseBlocks : [bubble];
 
-    while (walker.nextNode()) {
-        const node = walker.currentNode;
-        const tokens = node.textContent.match(/\S+\s*/g) || [];
-        if (tokens.length) {
-            textNodes.push({ node, tokens });
-            node.textContent = "";
-        }
-    }
+    blocks.forEach((block) => {
+        block.classList.add("assistant-stream-block");
+        block.hidden = true;
+    });
 
     bubble.classList.add("is-generating");
     bubble.setAttribute("aria-busy", "true");
 
-    for (const { node, tokens } of textNodes) {
-        for (const token of tokens) {
-            node.textContent += token;
-            assistantMessages.scrollTop = assistantMessages.scrollHeight;
-            await waitForAssistantTypewriter();
+    for (const block of blocks) {
+        const textNodes = [];
+        const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+
+        while (walker.nextNode()) {
+            const node = walker.currentNode;
+            const tokens = node.textContent.match(/\S+\s*/g) || [];
+            if (tokens.length) {
+                textNodes.push({ node, tokens });
+                node.textContent = "";
+            }
+        }
+
+        block.hidden = false;
+        block.classList.add("is-visible");
+
+        for (const { node, tokens } of textNodes) {
+            for (const token of tokens) {
+                node.textContent += token;
+                if (shouldFollowResponse) {
+                    shouldFollowResponse = isAssistantNearBottom();
+                }
+                if (shouldFollowResponse) {
+                    scrollAssistantToBottom();
+                }
+                await waitForAssistantTypewriter();
+            }
         }
     }
 
     bubble.classList.remove("is-generating");
     bubble.removeAttribute("aria-busy");
+    blocks.forEach((block) => {
+        block.classList.remove("assistant-stream-block", "is-visible");
+    });
 }
 
 function waitForAssistantTypewriter() {

@@ -258,10 +258,28 @@ class AdvancedPersonalAssistant:
             if project.get("name", "").lower() in query.lower()
             or any(tech.lower() in query.lower() for tech in project.get("technologies", []))
         ]
-        selected_projects = filtered_projects or projects
+
+        if not filtered_projects:
+            project_overview = []
+            for project in projects:
+                name = project.get("name", "Project")
+                description = project.get("description", "Software project").rstrip(".")
+                technologies = ", ".join(project.get("technologies", [])[:5])
+                summary = f"**{name}**\n{description}."
+                if technologies:
+                    summary += f"\n\nBuilt with **{technologies}**."
+                link = project.get("link")
+                if link and self.is_public_link(link):
+                    summary += f"\n\nView project: {link}"
+                project_overview.append(summary)
+
+            return (
+                f"Here are all {len(project_overview)} projects in my portfolio:\n\n"
+                + "\n\n".join(project_overview)
+            )
 
         project_summaries = []
-        for project in selected_projects[:2]:
+        for project in filtered_projects:
             name = project.get("name", "Project")
             description = project.get("description", "software project").rstrip(".").lower()
             article = "an" if description.startswith(("a", "e", "i", "o", "u")) else "a"
@@ -293,7 +311,7 @@ class AdvancedPersonalAssistant:
         if len(project_summaries) == 1:
             return project_summaries[0]
 
-        return "Here are two projects that show the kind of work I enjoy:\n\n" + "\n\n".join(project_summaries)
+        return "\n\n".join(project_summaries)
 
     def format_achievements(self):
         achievements = []

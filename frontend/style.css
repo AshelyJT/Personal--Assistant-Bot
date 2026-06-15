@@ -1502,6 +1502,26 @@ a {
     gap: 0.7rem;
 }
 
+.assistant-stream-block[hidden] {
+    display: none;
+}
+
+.assistant-stream-block.is-visible {
+    animation: assistantStreamReveal 0.18s ease-out both;
+}
+
+@keyframes assistantStreamReveal {
+    from {
+        opacity: 0;
+        transform: translateY(0.2rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .assistant-response h3 {
     font-size: 1rem;
     line-height: 1.35;
