@@ -10,6 +10,7 @@
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#050b14">
     <link rel="canonical" href="https://takudzwa-john.tech/">
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Takudzwa Ashely John Portfolio">
@@ -169,6 +170,7 @@
                 </div>
                 <div class="about-copy lazy_box">
                     <p>I am a Computer Systems Engineering graduate from Midlands State University with 12 months of industrial attachment experience at OK Zimbabwe Ltd. My experience spans Networking, Software Development, Technical Support, Cybersecurity, and Enterprise Systems.</p>
+                    <p>I also contribute to collaborative software projects with CodeGenius Engineers Group as a Software Developer and Project Contributor. This is project-based collaboration rather than formal employment, and I remain available for full-time graduate opportunities.</p>
                     <p>I am passionate about building practical digital solutions using software development, artificial intelligence, cloud technologies, IoT, and database systems. My final-year dissertation project, SmartShelf, combined Machine Learning, Django, MQTT, ESP32 microcontrollers, and digital shelf displays to create an AI-driven dynamic pricing system for retail environments.</p>
                     <p>I am currently open to Graduate Trainee, ICT Support, Software Development, Systems Support, Cloud, AI, and Technology-related opportunities.</p>
                 </div>
@@ -413,6 +415,38 @@
                     </div>
                 </article>
 
+                <article class="project-card lazy_box">
+                    <header class="project-card-header">
+                        <div class="project-number" aria-hidden="true">06</div>
+                        <div>
+                            <p class="project-role">Software Developer &amp; Project Contributor</p>
+                            <h3>CodeGenius Engineers Website</h3>
+                        </div>
+                    </header>
+                    <div class="project-problem">
+                        <span>Problem solved</span>
+                        <p>CodeGenius Engineers Group needed a professional online presence that clearly communicates its engineering services, capabilities, and portfolio to prospective clients.</p>
+                    </div>
+                    <h4 class="project-subheading">Technologies</h4>
+                    <ul class="tag-list" aria-label="CodeGenius Engineers Website technologies">
+                        <li>HTML</li>
+                        <li>CSS</li>
+                        <li>JavaScript</li>
+                        <li>Responsive Design</li>
+                        <li>Netlify</li>
+                    </ul>
+                    <h4 class="project-subheading">Key features</h4>
+                    <ul class="project-feature-list">
+                        <li>Responsive engineering services presentation</li>
+                        <li>Professional company and portfolio information</li>
+                        <li>Mobile-friendly navigation and contact experience</li>
+                    </ul>
+                    <div class="project-actions">
+                        <a class="project-action project-action-primary" href="https://codegenius-engineers.netlify.app/" target="_blank" rel="noopener noreferrer" aria-label="Open the live CodeGenius Engineers Website">Live Demo</a>
+                        <button class="project-action project-action-secondary" type="button" data-assistant-question="Tell me about the CodeGenius Engineers Website" aria-label="Open the CodeGenius Engineers Website case study in the portfolio assistant">Case Study</button>
+                    </div>
+                </article>
+
             </div>
         </section>
 
@@ -501,7 +535,9 @@
                 <h2>Ashely JT Assistant</h2>
                 <p>Skills, projects, certifications, experience, opportunities, or contact details.</p>
             </div>
-            <button class="assistant-close" id="assistant-close" type="button" aria-label="Close assistant">&times;</button>
+            <button class="assistant-close" id="assistant-close" type="button" aria-label="Close assistant">
+                <span aria-hidden="true"></span>
+            </button>
         </header>
 
         <div class="assistant-wake-status" id="assistant-wake-status" role="status" aria-live="polite" hidden>
@@ -521,7 +557,7 @@
         </div>
 
         <div class="assistant-messages" id="assistant-messages" aria-live="polite">
-            <div class="assistant-message assistant-message-ai">
+            <div class="assistant-message assistant-message-ai" id="assistant-greeting" hidden>
                 <div class="assistant-avatar" aria-hidden="true">AI</div>
                 <div class="assistant-bubble">
                     <p>Hello! I am Takudzwa's interactive graduate portfolio. Ask me about my skills, projects, certifications, internship experience, or career availability.</p>

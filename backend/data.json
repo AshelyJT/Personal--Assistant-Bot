@@ -3,7 +3,7 @@
     "name": "Takudzwa Ashely John",
     "title": "Computer Systems Engineering Graduate",
     "tagline": "AI | IoT | Cloud | Software Development | ICT Support | Cybersecurity",
-    "summary": "Computer Systems Engineering graduate with hands-on industrial experience in networking, software development, technical support, cybersecurity, and enterprise systems. I build practical technology solutions that solve real-world business problems.",
+    "summary": "Computer Systems Engineering graduate with hands-on industrial experience in networking, software development, technical support, cybersecurity, and enterprise systems. I also contribute to collaborative software projects with CodeGenius Engineers Group as a Software Developer and Project Contributor while remaining available for full-time graduate opportunities.",
     "email": "takudzwajohn3275@gmail.com",
     "phone_numbers": ["+263 786 530 315", "+263 712 723 622"],
     "location": "Harare, Zimbabwe",
@@ -39,6 +39,24 @@
         "Assisted with cybersecurity awareness, monitoring, and best practices.",
         "Contributed to ICT asset tracking, documentation, and technical support processes."
       ]
+    }
+  ],
+  "collaborations": [
+    {
+      "organization": "CodeGenius Engineers Group",
+      "role": "Software Developer and Project Contributor",
+      "relationship": "Project-based collaboration, not formal employment",
+      "availability": "Available for full-time graduate opportunities",
+      "project": "CodeGenius Engineers Website",
+      "description": "Contribute to collaborative software and web projects that support the group's professional engineering presence.",
+      "responsibilities": [
+        "Translate business and project requirements into practical web solutions.",
+        "Build responsive, maintainable user interfaces.",
+        "Organize engineering services, company information, portfolio content, and contact pathways.",
+        "Collaborate on technical planning, implementation, testing, and deployment."
+      ],
+      "technologies": ["HTML", "CSS", "JavaScript", "Responsive Design", "Netlify"],
+      "link": "https://codegenius-engineers.netlify.app/"
     }
   ],
   "education": [
@@ -120,6 +138,21 @@
       "impact": "Created a professional online presence that helps customers understand the company's services and request project quotations.",
       "challenge": "Presenting several creative services and product categories through a distinctive, responsive, and easy-to-navigate interface.",
       "link": "https://creatificant.netlify.app/"
+    },
+    {
+      "name": "CodeGenius Engineers Website",
+      "aliases": ["CodeGenius", "CodeGenius Engineers", "CodeGenius Website"],
+      "description": "Responsive corporate website presenting the engineering services, capabilities, portfolio, and contact information of CodeGenius Engineers Group.",
+      "technologies": ["HTML", "CSS", "JavaScript", "Responsive Design", "Netlify"],
+      "role": "Software developer and project contributor",
+      "features": [
+        "Responsive engineering services presentation",
+        "Professional company and portfolio information",
+        "Mobile-friendly navigation and contact experience"
+      ],
+      "impact": "Established a professional online presence for CodeGenius Engineers Group and made its services easier for prospective clients to explore.",
+      "challenge": "Organizing engineering services and company information into a clear, credible, and maintainable web experience.",
+      "link": "https://codegenius-engineers.netlify.app/"
     }
   ],
   "certifications": {

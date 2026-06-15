@@ -1,6 +1,7 @@
 const menuButton = document.getElementById("menu-button");
 const mobileNav = document.getElementById("sideBar");
 const menuBackdrop = document.getElementById("menu-backdrop");
+const siteHeader = document.querySelector(".site-header");
 
 function setMenuState(isOpen) {
     if (!menuButton || !mobileNav) return;
@@ -33,6 +34,36 @@ document.addEventListener("keydown", (event) => {
         setMenuState(false);
         menuButton.focus();
     }
+});
+
+document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+        const hash = link.getAttribute("href");
+        if (!hash || hash === "#") return;
+
+        const target = document.querySelector(hash);
+        if (!target) return;
+
+        event.preventDefault();
+        const targetContent = target.id === "home"
+            ? target
+            : target.querySelector(".section-heading") || target;
+        const headerHeight = siteHeader?.offsetHeight || 0;
+        const targetTop = target.id === "home"
+            ? 0
+            : targetContent.getBoundingClientRect().top
+                + window.scrollY
+                - headerHeight
+                - 20;
+
+        window.scrollTo({
+            top: Math.max(0, targetTop),
+            behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                ? "auto"
+                : "smooth"
+        });
+        window.history.pushState(null, "", hash);
+    });
 });
 
 const progressButton = document.getElementById("percentage");
@@ -160,6 +191,7 @@ const assistantBackdrop = document.getElementById("assistant-backdrop");
 const assistantLauncher = document.getElementById("assistant-launcher");
 const assistantClose = document.getElementById("assistant-close");
 const assistantMessages = document.getElementById("assistant-messages");
+const assistantGreeting = document.getElementById("assistant-greeting");
 const assistantForm = document.getElementById("assistant-form");
 const assistantInput = document.getElementById("assistant-input");
 const assistantSend = document.getElementById("assistant-send");
@@ -280,6 +312,7 @@ async function sendAssistantMessage() {
 
 async function ensureAssistantReady() {
     if (assistantHealthState === "ready") {
+        showAssistantGreeting();
         setAssistantAvailability(true);
         assistantInput?.focus();
         return true;
@@ -298,6 +331,7 @@ async function ensureAssistantReady() {
             stopAssistantWakeProgress();
             setAssistantWakeStep(2);
             hideAssistantWakeStatus();
+            showAssistantGreeting();
             setAssistantAvailability(true);
             assistantInput?.focus();
             return true;
@@ -377,6 +411,12 @@ function showAssistantWakeStatus() {
 
 function hideAssistantWakeStatus() {
     if (assistantWakeStatus) assistantWakeStatus.hidden = true;
+}
+
+function showAssistantGreeting() {
+    if (!assistantGreeting || !assistantGreeting.hidden) return;
+    assistantGreeting.hidden = false;
+    scrollAssistantToBottom();
 }
 
 function showAssistantDelayedStatus() {

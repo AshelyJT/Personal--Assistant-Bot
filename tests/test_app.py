@@ -27,12 +27,15 @@ class ChatEndpointTestCase(unittest.TestCase):
         resume = self.client.get("/files/Takudzwa-Ashely-John-CV.pdf")
         robots = self.client.get("/robots.txt")
         sitemap = self.client.get("/sitemap.xml")
+        favicon = self.client.get("/favicon.svg")
 
         self.assertEqual(stylesheet.status_code, 200)
         self.assertEqual(portrait.status_code, 200)
         self.assertEqual(resume.status_code, 200)
         self.assertEqual(robots.status_code, 200)
         self.assertEqual(sitemap.status_code, 200)
+        self.assertEqual(favicon.status_code, 200)
+        self.assertEqual(favicon.mimetype, "image/svg+xml")
         self.assertEqual(resume.mimetype, "application/pdf")
 
     def test_portfolio_phase_two_content_and_accessibility(self):
@@ -45,18 +48,20 @@ class ChatEndpointTestCase(unittest.TestCase):
             "ICT Asset Management System",
             "Portfolio Website",
             "Creatificant",
+            "CodeGenius Engineers Website",
         ):
             self.assertIn(project, html)
 
         self.assertIn('id="experience"', html)
         self.assertIn('id="certifications"', html)
         self.assertIn("OK Zimbabwe Limited", html)
+        self.assertIn("project-based collaboration rather than formal employment", html)
         self.assertIn("Computer Systems Engineering Graduate", html)
         self.assertIn("takudzwajohn3275@gmail.com", html)
         self.assertIn("+263 786 530 315", html)
         self.assertIn("+263 712 723 622", html)
-        self.assertEqual(html.count("Problem solved"), 5)
-        self.assertEqual(html.count("Key features"), 5)
+        self.assertEqual(html.count("Problem solved"), 6)
+        self.assertEqual(html.count("Key features"), 6)
         self.assertIn("Full-stack &amp; IoT Developer", html)
         self.assertIn("Designer &amp; Front-end Developer", html)
         self.assertIn("Live Demo", html)
@@ -64,6 +69,7 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("Case Study", html)
         self.assertIn("https://github.com/AshelyJT/Personal--Assistant-Bot", html)
         self.assertIn("https://creatificant.netlify.app/", html)
+        self.assertIn("https://codegenius-engineers.netlify.app/", html)
         self.assertIn("<title>Takudzwa Ashely John | Graduate Computer Systems Engineer</title>", html)
         self.assertIn('property="og:title"', html)
         self.assertIn('property="og:description"', html)
@@ -71,6 +77,7 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn('type="application/ld+json"', html)
         self.assertIn('class="hero-contact"', html)
         self.assertIn('src="./main.js" defer', html)
+        self.assertIn('rel="icon" type="image/svg+xml" href="./favicon.svg"', html)
         self.assertNotIn("fonts.cdnfonts.com", html)
         self.assertIn('href="./files/Takudzwa-Ashely-John-CV.pdf"', html)
         self.assertIn('label class="sr-only" for="assistant-input"', html)
@@ -87,6 +94,8 @@ class ChatEndpointTestCase(unittest.TestCase):
         stylesheet = self.client.get("/style.css").get_data(as_text=True)
 
         self.assertIn("Ashely JT Assistant", html)
+        self.assertIn('id="assistant-greeting" hidden', html)
+        self.assertIn('class="assistant-close"', html)
         self.assertIn("Starting Ashely JT Assistant...", html)
         self.assertIn("The first connection can take up to a minute while the service starts.", html)
         self.assertIn('class="assistant-wake-steps"', html)
@@ -111,13 +120,18 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertNotIn("typingMessage.remove()", script)
         self.assertIn("const isReady = await ensureAssistantReady()", script)
         self.assertIn("await sendAssistantMessage()", script)
+        self.assertIn("target.querySelector(\".section-heading\")", script)
+        self.assertIn("- headerHeight", script)
         self.assertIn('grid-template-areas:', stylesheet)
         self.assertIn('grid-area: suggestions;', stylesheet)
         self.assertIn('.assistant-bubble.is-generating::after', stylesheet)
         self.assertIn("startAssistantWakeProgress()", script)
+        self.assertIn("showAssistantGreeting()", script)
         self.assertNotIn("ASSISTANT_WAKE_MESSAGES", script)
         self.assertIn('class="assistant-response-divider"', script)
         self.assertIn('class="assistant-project-heading"', script)
+        self.assertIn(".assistant-close span::before", stylesheet)
+        self.assertIn(".assistant-close span::after", stylesheet)
 
     def test_health_endpoint_and_cors_headers(self):
         response = self.client.get("/health", headers={"Origin": "https://takudzwa-john.tech"})
@@ -170,15 +184,16 @@ class ChatEndpointTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(payload["intent"], "projects")
-        self.assertIn("Here are all 5 projects", payload["response"])
+        self.assertIn("Here are all 6 projects", payload["response"])
         self.assertIn("**1. SmartShelf AI**", payload["response"])
-        self.assertIn("**5. Creatificant**", payload["response"])
+        self.assertIn("**6. CodeGenius Engineers Website**", payload["response"])
         for project in (
             "SmartShelf AI",
             "AI Personal Assistant Chatbot",
             "ICT Asset Management System",
             "Portfolio Website",
             "Creatificant",
+            "CodeGenius Engineers Website",
         ):
             self.assertIn(project, payload["response"])
 
@@ -209,6 +224,47 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("Creatificant", payload["response"])
         self.assertIn("creative design", payload["response"].lower())
         self.assertIn("https://creatificant.netlify.app/", payload["response"])
+
+    def test_codegenius_project_question_returns_project_details(self):
+        response = self.post_chat("Tell me about the CodeGenius Engineers Website")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "projects")
+        self.assertIn("CodeGenius Engineers Website", payload["response"])
+        self.assertIn("project contributor", payload["response"].lower())
+        self.assertIn("https://codegenius-engineers.netlify.app/", payload["response"])
+
+    def test_codegenius_affiliation_is_not_presented_as_employment(self):
+        response = self.post_chat("Are you part of CodeGenius Engineers Group?")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "about")
+        self.assertIn("project-based collaboration", payload["response"].lower())
+        self.assertIn("not formal employment", payload["response"])
+        self.assertIn("available for full-time graduate opportunities", payload["response"].lower())
+        self.assertIn("Translate business and project requirements", payload["response"])
+        self.assertIn("HTML, CSS, JavaScript", payload["response"])
+        self.assertIn("https://codegenius-engineers.netlify.app/", payload["response"])
+
+    def test_codegenius_contribution_question_uses_collaboration_knowledge(self):
+        response = self.post_chat("What did you do with CodeGenius?")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "about")
+        self.assertIn("Software Developer and Project Contributor", payload["response"])
+        self.assertIn("technical planning", payload["response"])
+
+    def test_general_codegenius_question_returns_website_project(self):
+        response = self.post_chat("What is CodeGenius?")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "projects")
+        self.assertIn("CodeGenius Engineers Website", payload["response"])
+        self.assertIn("Responsive Design", payload["response"])
 
     def test_internship_response_mentions_asset_management_work(self):
         response = self.post_chat("Tell me about your internship experience")

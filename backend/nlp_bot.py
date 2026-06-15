@@ -44,7 +44,7 @@ class AdvancedPersonalAssistant:
             "skills": ["skills", "technologies", "stack", "programming", "languages", "tools", "networking", "support"],
             "experience": ["experience", "work", "job", "internship", "attachment", "career", "ok zimbabwe"],
             "education": ["education", "degree", "graduate", "graduation", "university", "college", "school", "msu"],
-            "projects": ["projects", "portfolio", "apps", "website", "smartshelf", "chatbot", "asset management", "asset tracking", "creatificant"],
+            "projects": ["projects", "portfolio", "apps", "website", "smartshelf", "chatbot", "asset management", "asset tracking", "creatificant", "codegenius"],
             "certifications": ["certification", "certifications", "certificate", "certificates", "credential", "credentials"],
             "opportunities": ["opportunity", "opportunities", "available", "availability", "role", "roles", "hire"],
             "contact": ["contact", "email", "linkedin", "reach", "phone"],
@@ -71,6 +71,26 @@ class AdvancedPersonalAssistant:
     def get_intent(self, user_input):
         text = user_input.lower()
         tokens = set(re.findall(r"[a-z0-9]+", text))
+
+        if "codegenius" in text and any(
+            phrase in text
+            for phrase in [
+                "part of",
+                "member",
+                "employed",
+                "work for",
+                "work with",
+                "worked with",
+                "your role",
+                "what did you do",
+                "contribute",
+                "collaborat",
+                "affiliation",
+                "relationship",
+            ]
+        ):
+            self.last_confidence = 0.95
+            return "about"
 
         if any(t in text for t in ["python", "django", "java", "c++", "cloud", "cybersecurity", "iot", "mqtt", "esp32"]):
             self.last_confidence = 0.92
@@ -248,6 +268,46 @@ class AdvancedPersonalAssistant:
             + "\n".join(groups)
         )
 
+    def format_codegenius_collaboration(self):
+        collaborations = self.data.get("collaborations", [])
+        collaboration = next(
+            (
+                item for item in collaborations
+                if "codegenius" in item.get("organization", "").lower()
+            ),
+            {},
+        )
+        if not collaboration:
+            return "I do not have CodeGenius Engineers Group details available yet."
+
+        response = (
+            f"I contribute to collaborative software projects with "
+            f"**{collaboration.get('organization', 'CodeGenius Engineers Group')}** "
+            f"as a **{collaboration.get('role', 'Project Contributor')}**.\n\n"
+            f"**Relationship:** {collaboration.get('relationship', 'Project-based collaboration')}.\n\n"
+            f"{collaboration.get('description', '')}"
+        )
+
+        responsibilities = collaboration.get("responsibilities", [])
+        if responsibilities:
+            response += "\n\nMy contributions include:\n" + "\n".join(
+                f"- {responsibility}" for responsibility in responsibilities
+            )
+
+        technologies = collaboration.get("technologies", [])
+        if technologies:
+            response += f"\n\n**Technologies:** {', '.join(technologies)}."
+
+        link = collaboration.get("link")
+        if self.is_public_link(link):
+            response += f"\n\nView the website: {link}"
+
+        availability = collaboration.get("availability")
+        if availability:
+            response += f"\n\n**Availability:** {availability}."
+
+        return response
+
     def format_projects(self, query=""):
         projects = self.data.get("projects", [])
         if not projects:
@@ -256,6 +316,10 @@ class AdvancedPersonalAssistant:
         filtered_projects = [
             project for project in projects
             if project.get("name", "").lower() in query.lower()
+            or any(
+                alias.lower() in query.lower()
+                for alias in project.get("aliases", [])
+            )
             or any(tech.lower() in query.lower() for tech in project.get("technologies", []))
         ]
 
@@ -351,6 +415,8 @@ class AdvancedPersonalAssistant:
             title = personal_info.get("title", "Computer Systems Engineering Graduate")
             location = personal_info.get("location", "Zimbabwe")
             summary = personal_info.get("summary", "")
+            if "codegenius" in text:
+                return self.format_codegenius_collaboration()
             return f"I'm **{name}**, a {title} based in {location}. {summary}"
 
         if intent == "skills":
