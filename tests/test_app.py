@@ -41,6 +41,7 @@ class ChatEndpointTestCase(unittest.TestCase):
     def test_portfolio_phase_two_content_and_accessibility(self):
         response = self.client.get("/")
         html = response.get_data(as_text=True)
+        stylesheet = self.client.get("/style.css").get_data(as_text=True)
 
         for project in (
             "SmartShelf AI",
@@ -82,6 +83,10 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn('href="./files/Takudzwa-Ashely-John-CV.pdf"', html)
         self.assertIn('label class="sr-only" for="assistant-input"', html)
         self.assertIn('aria-label="Open navigation menu"', html)
+        self.assertIn('class="mobile-assistant-icon"', html)
+        self.assertIn("Explore my skills and projects", html)
+        self.assertIn(".mobile-assistant-copy", stylesheet)
+        self.assertIn(".mobile-assistant-arrow", stylesheet)
         self.assertNotIn('href=""', html)
         self.assertIsNone(re.search(r"\bto\s+to\b", html, re.IGNORECASE))
         self.assertNotIn("perfomance", html.lower())
