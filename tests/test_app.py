@@ -25,10 +25,14 @@ class ChatEndpointTestCase(unittest.TestCase):
         stylesheet = self.client.get("/style.css")
         portrait = self.client.get("/images/me.jpg")
         resume = self.client.get("/files/Takudzwa-Ashely-John-CV.pdf")
+        robots = self.client.get("/robots.txt")
+        sitemap = self.client.get("/sitemap.xml")
 
         self.assertEqual(stylesheet.status_code, 200)
         self.assertEqual(portrait.status_code, 200)
         self.assertEqual(resume.status_code, 200)
+        self.assertEqual(robots.status_code, 200)
+        self.assertEqual(sitemap.status_code, 200)
         self.assertEqual(resume.mimetype, "application/pdf")
 
     def test_portfolio_phase_two_content_and_accessibility(self):
@@ -36,13 +40,38 @@ class ChatEndpointTestCase(unittest.TestCase):
         html = response.get_data(as_text=True)
 
         for project in (
-            "SmartShelf AI Pricing System",
-            "CodeGenius Website",
-            "Personal Assistant Bot",
-            "Web Portfolio",
+            "SmartShelf AI",
+            "AI Personal Assistant Chatbot",
+            "ICT Asset Management System",
+            "Portfolio Website",
+            "Creatificant",
         ):
             self.assertIn(project, html)
 
+        self.assertIn('id="experience"', html)
+        self.assertIn('id="certifications"', html)
+        self.assertIn("OK Zimbabwe Limited", html)
+        self.assertIn("Computer Systems Engineering Graduate", html)
+        self.assertIn("takudzwajohn3275@gmail.com", html)
+        self.assertIn("+263 786 530 315", html)
+        self.assertIn("+263 712 723 622", html)
+        self.assertEqual(html.count("Problem solved"), 5)
+        self.assertEqual(html.count("Key features"), 5)
+        self.assertIn("Full-stack &amp; IoT Developer", html)
+        self.assertIn("Designer &amp; Front-end Developer", html)
+        self.assertIn("Live Demo", html)
+        self.assertIn("GitHub", html)
+        self.assertIn("Case Study", html)
+        self.assertIn("https://github.com/AshelyJT/Personal--Assistant-Bot", html)
+        self.assertIn("https://creatificant.netlify.app/", html)
+        self.assertIn("<title>Takudzwa Ashely John | Graduate Computer Systems Engineer</title>", html)
+        self.assertIn('property="og:title"', html)
+        self.assertIn('property="og:description"', html)
+        self.assertIn('name="keywords"', html)
+        self.assertIn('type="application/ld+json"', html)
+        self.assertIn('class="hero-contact"', html)
+        self.assertIn('src="./main.js" defer', html)
+        self.assertNotIn("fonts.cdnfonts.com", html)
         self.assertIn('href="./files/Takudzwa-Ashely-John-CV.pdf"', html)
         self.assertIn('label class="sr-only" for="assistant-input"', html)
         self.assertIn('aria-label="Open navigation menu"', html)
@@ -60,6 +89,9 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("Ashely JT Assistant", html)
         self.assertIn("Starting Ashely JT Assistant...", html)
         self.assertIn("The assistant is waking up. This may take a moment.", html)
+        self.assertIn('<div class="assistant-loader" aria-hidden="true">', html)
+        self.assertIn("@keyframes assistantLoaderProgress", stylesheet)
+        self.assertNotIn("@keyframes assistantLoaderSpin", stylesheet)
         self.assertRegex(
             script,
             r'const ASSISTANT_API_BASE_URL = "https://[^"]+";',
@@ -72,6 +104,8 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("await typeAssistantResponse(typingMessage, answer.response)", script)
         self.assertIn("document.createTreeWalker", script)
         self.assertNotIn("typingMessage.remove()", script)
+        self.assertIn("const isReady = await ensureAssistantReady()", script)
+        self.assertIn("await sendAssistantMessage()", script)
         self.assertIn('grid-template-areas:', stylesheet)
         self.assertIn('grid-area: suggestions;', stylesheet)
         self.assertIn('.assistant-bubble.is-generating::after', stylesheet)
@@ -115,21 +149,80 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertEqual(payload["intent"], "skills")
 
     def test_project_question_returns_project_intent(self):
-        response = self.post_chat("Tell me about Campus VibeMarket")
+        response = self.post_chat("Tell me about SmartShelf AI")
         payload = response.get_json()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(payload["intent"], "projects")
-        self.assertIn("Campus VibeMarket", payload["response"])
+        self.assertIn("SmartShelf AI", payload["response"])
+        self.assertIn("Machine Learning", payload["response"])
         self.assertNotIn("Stack:", payload["response"])
         self.assertNotIn("Role:", payload["response"])
+
+    def test_chatbot_question_returns_project_details(self):
+        response = self.post_chat("Tell me about the AI Personal Assistant Chatbot")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "projects")
+        self.assertIn("AI Personal Assistant Chatbot", payload["response"])
+        self.assertIn("web interface", payload["response"])
+
+    def test_asset_management_question_returns_internship_project(self):
+        response = self.post_chat("Tell me about the ICT Asset Management System")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "projects")
+        self.assertIn("ICT Asset Management System", payload["response"])
+        self.assertIn("tracking ict assets", payload["response"].lower())
+
+    def test_creatificant_question_returns_project_details(self):
+        response = self.post_chat("Tell me about Creatificant")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "projects")
+        self.assertIn("Creatificant", payload["response"])
+        self.assertIn("creative design", payload["response"].lower())
+        self.assertIn("https://creatificant.netlify.app/", payload["response"])
+
+    def test_internship_response_mentions_asset_management_work(self):
+        response = self.post_chat("Tell me about your internship experience")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "experience")
+        self.assertIn("OK Zimbabwe Limited", payload["response"])
+        self.assertIn("network support", payload["response"])
+        self.assertIn("cybersecurity awareness", payload["response"])
 
     def test_skills_response_is_conversational(self):
         response = self.post_chat("What are your technical skills?")
         payload = response.get_json()
 
-        self.assertIn("My strongest language", payload["response"])
-        self.assertNotIn("Languages:", payload["response"])
+        self.assertIn("Programming", payload["response"])
+        self.assertIn("Cybersecurity", payload["response"])
+        self.assertIn("Oracle Cloud", payload["response"])
+
+    def test_certifications_are_grouped_by_focus(self):
+        response = self.post_chat("what certifications do you have")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "certifications")
+        self.assertIn("AI & Data", payload["response"])
+        self.assertIn("Software Development", payload["response"])
+        self.assertIn("Cloud, Infrastructure & DevOps", payload["response"])
+
+    def test_career_availability_response(self):
+        response = self.post_chat("Are you available for graduate trainee roles?")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "opportunities")
+        self.assertIn("Graduate Trainee", payload["response"])
+        self.assertIn("ICT Support", payload["response"])
 
     def test_problem_solving_question_returns_behavioral_story(self):
         response = self.post_chat("How did you solve a difficult problem?")
@@ -137,7 +230,7 @@ class ChatEndpointTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(payload["intent"], "behavioral")
-        self.assertIn("legacy workflow", payload["response"])
+        self.assertIn("ICT asset tracking", payload["response"])
         self.assertNotIn("based in Harare", payload["response"])
 
     def test_contact_response_includes_phone_numbers(self):
@@ -145,8 +238,18 @@ class ChatEndpointTestCase(unittest.TestCase):
         payload = response.get_json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("0786530315", payload["response"])
-        self.assertIn("0712723622", payload["response"])
+        self.assertIn("takudzwajohn3275@gmail.com", payload["response"])
+        self.assertIn("+263 786 530 315", payload["response"])
+        self.assertIn("+263 712 723 622", payload["response"])
+
+    def test_education_response_identifies_graduate_status(self):
+        response = self.post_chat("What is your education?")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "education")
+        self.assertIn("graduate of", payload["response"])
+        self.assertIn("completed in 2026", payload["response"])
 
     def test_empty_message_is_rejected(self):
         response = self.post_chat("")

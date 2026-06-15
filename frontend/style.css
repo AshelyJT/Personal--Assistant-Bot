@@ -1,7 +1,5 @@
-@import url("https://fonts.cdnfonts.com/css/sf-pro-display");
-
 :root {
-    --font-family: "SF Pro Display", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --bg: #050b14;
     --bg-soft: #091321;
     --surface: #0d1928;
@@ -29,6 +27,36 @@
 html {
     scroll-behavior: smooth;
     scroll-padding-top: calc(var(--header-height) + 1rem);
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-strong) var(--bg-soft);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-strong) var(--bg-soft);
+}
+
+*::-webkit-scrollbar {
+    width: 0.7rem;
+    height: 0.7rem;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--bg-soft);
+}
+
+*::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+    border: 2px solid var(--bg-soft);
+    border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #67f4fa;
+}
+
+*::-webkit-scrollbar-corner {
+    background: var(--bg-soft);
 }
 
 body {
@@ -323,11 +351,54 @@ a {
     line-height: 1.5;
 }
 
+.hero-focus {
+    max-width: 760px;
+    margin-top: 0.65rem;
+    color: var(--text);
+    font-size: clamp(0.88rem, 2vw, 1rem);
+    font-weight: 650;
+    letter-spacing: 0.02em;
+}
+
+.hero-focus span {
+    margin-inline: 0.2rem;
+    color: var(--accent);
+}
+
 .hero-subtitle {
     max-width: 620px;
     margin-top: 1rem;
     color: var(--text-muted);
     font-size: clamp(1rem, 2.5vw, 1.18rem);
+}
+
+.hero-contact {
+    margin-top: 1.15rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-style: normal;
+}
+
+.hero-contact a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    text-decoration: none;
+}
+
+.hero-contact a::before {
+    width: 0.38rem;
+    height: 0.38rem;
+    content: "";
+    background: var(--accent);
+    border-radius: 50%;
+}
+
+.hero-contact a:hover {
+    color: var(--text);
 }
 
 .hero-actions {
@@ -589,6 +660,68 @@ a {
     margin-top: 1.15rem;
 }
 
+.experience-card p:not(.education-date):not(.education-school) {
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+.experience-highlights {
+    margin-top: 1.25rem;
+}
+
+.responsibility-list {
+    display: grid;
+    gap: 0.7rem;
+    padding-left: 1.2rem;
+    color: var(--text-muted);
+}
+
+.responsibility-list li::marker {
+    color: var(--accent);
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 1rem;
+}
+
+.skill-category,
+.certification-card {
+    padding: 1.5rem;
+    background: linear-gradient(145deg, var(--surface-light), var(--surface));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.14);
+}
+
+.skill-category h3,
+.certification-card h3 {
+    font-size: 1.12rem;
+    line-height: 1.3;
+}
+
+.skill-category p,
+.certification-card p {
+    margin-top: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.certification-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: 1.25rem;
+}
+
+.certification-card span {
+    display: block;
+    margin-bottom: 1.5rem;
+    color: var(--accent);
+    font-family: ui-monospace, "Cascadia Code", monospace;
+    font-size: 0.85rem;
+}
+
 .skill-bars,
 .technology-panel {
     padding: clamp(1.35rem, 4vw, 2rem);
@@ -645,8 +778,8 @@ a {
 .projects-grid,
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: 1.5rem;
 }
 
 .section-intro {
@@ -680,10 +813,18 @@ a {
 }
 
 .project-number {
-    margin-bottom: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: 0 0 2.5rem;
+    display: grid;
+    place-items: center;
+    background: var(--accent-soft);
     color: var(--accent);
+    border: 1px solid rgba(25, 220, 230, 0.25);
+    border-radius: 0.75rem;
     font-family: ui-monospace, "Cascadia Code", monospace;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 700;
 }
 
 .project-card h3,
@@ -692,40 +833,121 @@ a {
     line-height: 1.25;
 }
 
-.project-card p,
 .service-card p {
     margin: 1rem 0 1.5rem;
     color: var(--text-muted);
 }
 
-.tag-list {
-    margin-top: auto;
+.project-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
 }
 
-.project-link {
-    width: fit-content;
-    margin-top: 1.5rem;
-    padding-bottom: 0.2rem;
+.project-role {
+    margin-bottom: 0.3rem;
     color: var(--accent);
-    border-bottom: 1px solid transparent;
-    font: inherit;
-    font-weight: 700;
-    text-decoration: none;
-    transition: border-color 0.2s ease, color 0.2s ease;
+    font-size: 0.72rem;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+    line-height: 1.3;
+    text-align: left;
+    text-transform: uppercase;
 }
 
-.project-link:hover,
-.project-link:focus-visible {
+.project-problem {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(5, 11, 20, 0.5);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.project-problem span,
+.project-subheading {
     color: var(--text);
-    border-color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
-.project-link-button {
-    appearance: none;
-    background: transparent;
-    border: 0;
-    border-bottom: 1px solid transparent;
+.project-problem p {
+    margin-top: 0.4rem;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    text-align: left;
+}
+
+.project-subheading {
+    margin: 1.35rem 0 0.7rem;
+}
+
+.tag-list {
+    gap: 0.5rem;
+}
+
+.project-feature-list {
+    display: grid;
+    gap: 0.55rem;
+    padding-left: 1.2rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.project-feature-list li::marker {
+    color: var(--accent);
+}
+
+.project-actions {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.project-action {
+    min-height: 2.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 750;
+    line-height: 1;
+    text-decoration: none;
     cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.project-action:hover {
+    transform: translateY(-2px);
+}
+
+.project-action-primary {
+    background: var(--accent);
+    color: #031015;
+}
+
+.project-action-primary:hover {
+    background: #67f4fa;
+}
+
+.project-action-secondary {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.project-action-secondary:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
 }
 
 .sr-only {
@@ -1149,18 +1371,32 @@ a {
 }
 
 .assistant-loader {
-    width: 1.65rem;
-    height: 1.65rem;
-    flex: 0 0 1.65rem;
-    border: 3px solid rgba(15, 118, 110, 0.18);
-    border-top-color: #0f766e;
-    border-radius: 50%;
-    animation: assistantLoaderSpin 0.8s linear infinite;
+    width: 3.25rem;
+    height: 0.42rem;
+    flex: 0 0 3.25rem;
+    position: relative;
+    margin-top: 0.45rem;
+    overflow: hidden;
+    background: rgba(15, 118, 110, 0.16);
+    border-radius: 999px;
+}
+
+.assistant-loader span {
+    width: 45%;
+    height: 100%;
+    position: absolute;
+    inset: 0 auto 0 -45%;
+    background: linear-gradient(90deg, #0f766e, #19dce6);
+    border-radius: inherit;
+    animation: assistantLoaderProgress 1.15s ease-in-out infinite;
 }
 
 .assistant-wake-status.is-delayed .assistant-loader {
-    border-color: rgba(146, 98, 20, 0.18);
-    border-top-color: #926214;
+    background: rgba(146, 98, 20, 0.16);
+}
+
+.assistant-wake-status.is-delayed .assistant-loader span {
+    background: linear-gradient(90deg, #926214, #e0ad42);
 }
 
 .assistant-wake-status button {
@@ -1174,8 +1410,19 @@ a {
     cursor: pointer;
 }
 
-@keyframes assistantLoaderSpin {
-    to { transform: rotate(360deg); }
+@keyframes assistantLoaderProgress {
+    0% {
+        left: -45%;
+    }
+
+    55% {
+        width: 65%;
+    }
+
+    100% {
+        left: 100%;
+        width: 45%;
+    }
 }
 
 .assistant-messages {
@@ -1405,7 +1652,7 @@ body.assistant-open {
     }
 }
 
-@media (min-width: 980px) {
+@media (min-width: 1100px) {
     .desktop-nav {
         display: block;
     }
@@ -1413,11 +1660,11 @@ body.assistant-open {
     .desktop-nav ul {
         display: flex;
         align-items: center;
-        gap: clamp(1rem, 2vw, 1.75rem);
+        gap: clamp(0.65rem, 1.15vw, 1.15rem);
     }
 
     .desktop-nav a {
-        font-size: 0.92rem;
+        font-size: 0.84rem;
     }
 
     .menu-button,
@@ -1435,6 +1682,11 @@ body.assistant-open {
     .hero-title {
         display: grid;
         gap: 0.25rem;
+    }
+
+    .hero-contact {
+        display: grid;
+        gap: 0.45rem;
     }
 
     .hero-visual {

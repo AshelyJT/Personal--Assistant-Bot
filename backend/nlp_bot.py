@@ -41,10 +41,12 @@ class AdvancedPersonalAssistant:
         self.intents = {
             "greeting": ["hello", "hi", "hey", "greetings"],
             "about": ["about", "yourself", "who are you", "summary", "profile", "intro"],
-            "skills": ["skills", "technologies", "stack", "programming", "languages", "tools", "libraries"],
-            "experience": ["experience", "work", "job", "internship", "career", "ok zimbabwe"],
-            "education": ["education", "degree", "university", "college", "school", "msu"],
-            "projects": ["projects", "portfolio", "apps", "github", "website", "codegenius", "vibemarket"],
+            "skills": ["skills", "technologies", "stack", "programming", "languages", "tools", "networking", "support"],
+            "experience": ["experience", "work", "job", "internship", "attachment", "career", "ok zimbabwe"],
+            "education": ["education", "degree", "graduate", "graduation", "university", "college", "school", "msu"],
+            "projects": ["projects", "portfolio", "apps", "website", "smartshelf", "chatbot", "asset management", "asset tracking", "creatificant"],
+            "certifications": ["certification", "certifications", "certificate", "certificates", "credential", "credentials"],
+            "opportunities": ["opportunity", "opportunities", "available", "availability", "role", "roles", "hire"],
             "contact": ["contact", "email", "linkedin", "reach", "phone"],
             "achievements": ["achievement", "achievements", "accomplishment", "impact", "built", "automated"],
             "behavioral": [
@@ -70,7 +72,7 @@ class AdvancedPersonalAssistant:
         text = user_input.lower()
         tokens = set(re.findall(r"[a-z0-9]+", text))
 
-        if any(t in text for t in ["python", "django", "flutter", "react"]):
+        if any(t in text for t in ["python", "django", "java", "c++", "cloud", "cybersecurity", "iot", "mqtt", "esp32"]):
             self.last_confidence = 0.92
             return "technical"
 
@@ -78,7 +80,9 @@ class AdvancedPersonalAssistant:
             "achievements",
             "projects",
             "experience",
+            "opportunities",
             "education",
+            "certifications",
             "contact",
             "skills",
             "behavioral",
@@ -169,13 +173,23 @@ class AdvancedPersonalAssistant:
             ],
             "experience": [
                 "What achievements are you proud of?",
-                "How did you solve a difficult problem?",
-                "What did you automate?",
+                "What ICT support experience do you have?",
+                "What did you do at OK Zimbabwe?",
             ],
             "projects": [
-                "Tell me about Campus VibeMarket",
-                "Tell me about CodeGenius Engineers Website",
-                "What technologies did you use?",
+                "Tell me about SmartShelf AI",
+                "Tell me about the AI Personal Assistant Chatbot",
+                "Tell me about Creatificant",
+            ],
+            "certifications": [
+                "What cloud skills do you have?",
+                "What are your AI and data skills?",
+                "What software development skills do you have?",
+            ],
+            "opportunities": [
+                "What are your strongest technical skills?",
+                "Tell me about your internship experience",
+                "How can I contact you?",
             ],
             "achievements": [
                 "Tell me about your internship experience",
@@ -199,10 +213,40 @@ class AdvancedPersonalAssistant:
     def get_profile_metrics(self):
         skills = self.get_skills()
         return {
-            "languages": len(skills.get("programming_languages", [])),
+            "languages": len(skills.get("Programming", [])),
             "projects": len(self.data.get("projects", [])),
             "experience_items": len(self.data.get("experience", [])),
         }
+
+    def format_skills(self):
+        skills = self.get_skills()
+        if not skills:
+            return "I do not have skill details available yet."
+
+        sections = []
+        for category, items in skills.items():
+            if items:
+                sections.append(f"- **{category}:** {', '.join(items)}")
+
+        return (
+            "My technical skills cover software, infrastructure, and intelligent systems:\n\n"
+            + "\n".join(sections)
+        )
+
+    def format_certifications(self):
+        certifications = self.data.get("certifications", {})
+        if not certifications:
+            return "I do not have certification details available yet."
+
+        groups = [
+            f"- **{category}:** {', '.join(items)}"
+            for category, items in certifications.items()
+            if items
+        ]
+        return (
+            "My certifications and professional learning are grouped into these areas:\n\n"
+            + "\n".join(groups)
+        )
 
     def format_projects(self, query=""):
         projects = self.data.get("projects", [])
@@ -282,39 +326,17 @@ class AdvancedPersonalAssistant:
 
         if intent == "greeting":
             name = personal_info.get("name", "Takudzwa")
-            return f"Hello! I am {name}'s AI assistant. Ask me about internship experience, Python skills, education, or projects."
+            return f"Hello! I am {name}'s AI assistant. Ask me about graduate opportunities, technical skills, certifications, experience, or projects."
 
         if intent == "about":
             name = personal_info.get("name", "Takudzwa")
-            title = personal_info.get("title", "Software Developer")
+            title = personal_info.get("title", "Computer Systems Engineering Graduate")
             location = personal_info.get("location", "Zimbabwe")
-            return (
-                f"I'm **{name}**, a {title} based in {location}. "
-                "I enjoy turning practical problems into useful software, especially through "
-                "backend development, mobile apps, and intelligent systems."
-            )
+            summary = personal_info.get("summary", "")
+            return f"I'm **{name}**, a {title} based in {location}. {summary}"
 
         if intent == "skills":
-            skills = self.get_skills()
-            languages = [
-                language.title() if language.upper() == "JAVA" else language
-                for language in skills.get("programming_languages", [])
-                if language.lower() != "python"
-            ]
-            langs = ", ".join(languages) or "JavaScript and SQL"
-            frameworks = ", ".join(skills.get("frameworks", [])) or "Flask, Django, React, and Flutter"
-            tools = ", ".join(skills.get("tools", []))
-            libraries = ", ".join(skills.get("libraries", []))
-            response = (
-                f"My strongest language is **Python**, and I also work with {langs}. "
-                f"For application development, I use **{frameworks}** depending on whether "
-                "the project is web, backend, or mobile."
-            )
-            if libraries:
-                response += f"\n\nI have also used {libraries} for data and machine-learning work."
-            if tools:
-                response += f" My regular development tools include {tools}."
-            return response
+            return self.format_skills()
 
         if intent == "experience":
             role = self.get_first_item("experience")
@@ -322,8 +344,8 @@ class AdvancedPersonalAssistant:
                 return "I do not have experience details available yet."
             achievements = role.get("achievements", [])
             description = role.get("description", "").strip()
-            if description.lower().startswith("worked "):
-                description = f"I {description[0].lower() + description[1:]}"
+            if description:
+                description = description[0].lower() + description[1:]
             response = (
                 f"I worked as an **{role.get('role', 'ICT Intern')}** at "
                 f"**{role.get('company', 'OK Zimbabwe Limited')}** from "
@@ -331,7 +353,7 @@ class AdvancedPersonalAssistant:
                 f"During that time, {description}"
             )
             if achievements:
-                response += "\n\nTwo highlights from that experience were:\n" + "\n".join(
+                response += "\n\nMy responsibilities included:\n" + "\n".join(
                     f"- {achievement}" for achievement in achievements
                 )
             return response
@@ -342,11 +364,26 @@ class AdvancedPersonalAssistant:
         if intent == "achievements":
             return self.format_achievements()
 
+        if intent == "certifications":
+            return self.format_certifications()
+
+        if intent == "opportunities":
+            opportunities = personal_info.get("opportunities", [])
+            role_list = ", ".join(opportunities) or "graduate technology roles"
+            return (
+                "I am currently open to career opportunities in "
+                f"**{role_list}**. I am available to discuss roles based in Harare "
+                "as well as suitable remote or hybrid opportunities."
+            )
+
         if intent == "education":
             edu = self.get_first_item("education")
             if not edu:
                 return "I do not have education details available yet."
-            return f"I am studying for a **{edu.get('degree', 'degree')}** at **{edu.get('institution', 'university')}**, expected to graduate in {edu.get('year', 'the near future')}."
+            return (
+                f"I am a graduate of **{edu.get('institution', 'university')}** with a "
+                f"**{edu.get('degree', 'degree')}**, completed in {edu.get('year', '2026')}."
+            )
 
         if intent == "contact":
             email = personal_info.get("email", "No email listed")
@@ -376,7 +413,7 @@ class AdvancedPersonalAssistant:
             for tech, deep_dive in deep_dives.items():
                 if tech in text:
                     return f"When it comes to **{tech.title()}**, {deep_dive[0].lower() + deep_dive[1:]}"
-            return "I can discuss my technical depth in Python, Django, React, or Flutter. Which one interests you?"
+            return "I can discuss my technical depth in Python, Django, cloud, cybersecurity, or IoT. Which one interests you?"
 
         return "I'm not sure I understand. Try asking about my **Skills**, **Projects**, or **Education**."
 

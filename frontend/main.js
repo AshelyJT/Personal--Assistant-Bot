@@ -213,10 +213,13 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.querySelectorAll("[data-assistant-question]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
         if (!assistantInput) return;
+        setAssistantState(true);
+        const isReady = await ensureAssistantReady();
+        if (!isReady) return;
         assistantInput.value = button.dataset.assistantQuestion;
-        sendAssistantMessage();
+        await sendAssistantMessage();
     });
 });
 

@@ -1,31 +1,43 @@
 {
   "personal_info": {
     "name": "Takudzwa Ashely John",
-    "title": "Software Developer | Computer Systems Engineering Student",
-    "email": "tashely99@gmail.com",
-    "phone_numbers": ["0786530315", "0712723622"],
+    "title": "Computer Systems Engineering Graduate",
+    "tagline": "AI | IoT | Cloud | Software Development | ICT Support | Cybersecurity",
+    "summary": "Computer Systems Engineering graduate with hands-on industrial experience in networking, software development, technical support, cybersecurity, and enterprise systems. I build practical technology solutions that solve real-world business problems.",
+    "email": "takudzwajohn3275@gmail.com",
+    "phone_numbers": ["+263 786 530 315", "+263 712 723 622"],
     "location": "Harare, Zimbabwe",
+    "opportunities": ["Graduate Trainee", "ICT Support", "Software Development", "Systems Support", "Cloud", "AI", "Technology"],
     "linkedin": "https://www.linkedin.com/in/takudzwa-ashely-john-334b182b5/",
-    "github": "https://github.com/yourusername",
+    "github": "https://github.com/AshelyJT",
     "portfolio": "https://yourportfolio.com",
     "resume": ""
   },
   "skills": {
-    "programming_languages": ["Python", "JavaScript", "SQL", "Java", "Dart"],
-    "frameworks": ["Flask", "Django", "React", "Flutter", "Bootstrap"],
-    "tools": ["Git", "GitHub", "Docker", "VSCode", "ESP32", "MQTT"],
-    "libraries": ["Pandas", "NumPy", "TensorFlow", "Scikit-learn"],
-    "soft_skills": ["Problem Solving", "Communication", "Teamwork", "Adaptability", "Leadership"]
+    "Programming": ["Python", "Java", "C++", "JavaScript"],
+    "Web Development": ["HTML", "CSS", "JavaScript", "Django"],
+    "Databases": ["SQL", "Database Design"],
+    "AI & Data": ["Machine Learning", "Data Science", "Generative AI"],
+    "ICT Support": ["Hardware", "Software", "Troubleshooting", "User Support"],
+    "Networking": ["Network Support", "Infrastructure Support"],
+    "Cybersecurity": ["Security Fundamentals", "Awareness", "Monitoring"],
+    "Cloud & DevOps": ["Oracle Cloud", "DevOps Concepts"],
+    "IoT": ["ESP32", "MQTT", "Embedded Systems"],
+    "Tools": ["Git", "VS Code", "Microsoft 365"]
   },
   "experience": [
     {
       "company": "OK Zimbabwe Limited",
       "role": "ICT Intern",
       "duration": "August 2024 - July 2025",
-      "description": "Worked on various IT projects including system administration and network management.",
+      "description": "Completed 12 months of industrial attachment supporting ICT operations across networking, software development, technical support, cybersecurity, and enterprise systems.",
       "achievements": [
-        "Developed an ICT Asset Management System using Python and Django.",
-        "Automated routine internal tasks to improve efficiency."
+        "Assisted with ICT infrastructure and network support.",
+        "Provided end-user support for hardware, software, and peripheral issues.",
+        "Participated in software development and system enhancement tasks.",
+        "Supported enterprise systems operations and user account administration.",
+        "Assisted with cybersecurity awareness, monitoring, and best practices.",
+        "Contributed to ICT asset tracking, documentation, and technical support processes."
       ]
     }
   ],
@@ -34,85 +46,106 @@
       "institution": "Midlands State University",
       "degree": "Bachelor of Science in Computer Systems Engineering",
       "year": "2026",
-      "gpa": "Expected 1 Honours (First Class)",
+      "status": "Graduate",
       "achievements": []
     }
   ],
   "projects": [
     {
-      "name": "SmartShelf AI Pricing System",
-      "description": "AI-driven dynamic pricing and digital shelf display system",
-      "technologies": ["Python", "Django", "ESP32", "MQTT", "SQLite", "Machine Learning"],
+      "name": "SmartShelf AI",
+      "description": "Final-year dissertation project that uses machine learning to recommend product prices and updates digital shelf displays in real time using ESP32 microcontrollers and MQTT communication.",
+      "technologies": ["Python", "Django", "Machine Learning", "MQTT", "ESP32", "LCD Displays", "SQLite", "IoT"],
       "role": "Full-stack and IoT developer",
       "features": [
-        "AI-assisted product pricing",
-        "MQTT communication between Django and ESP32 devices",
-        "Digital shelf price displays"
+        "Machine-learning product price recommendations",
+        "Real-time MQTT communication with ESP32 microcontrollers",
+        "Digital shelf price updates on LCD displays"
       ],
-      "impact": "Connected software, machine learning, and embedded hardware in a practical retail prototype.",
-      "challenge": "Keeping web application data and physical shelf displays synchronized.",
+      "impact": "Combined artificial intelligence, web development, and embedded IoT hardware in a practical retail pricing solution.",
+      "challenge": "Keeping pricing recommendations and physical shelf displays synchronized in real time.",
       "link": ""
     },
     {
-      "name": "CodeGenius Engineers Website",
-      "description": "Responsive business website showcasing digital services and portfolio work.",
-      "technologies": ["HTML", "CSS", "JavaScript", "Bootstrap"],
-      "role": "Front-end web developer",
+      "name": "AI Personal Assistant Chatbot",
+      "description": "Personal assistant chatbot designed to interact with users through a web interface and provide helpful automated responses.",
+      "technologies": ["Python", "JavaScript", "Web Technologies", "AI APIs"],
+      "role": "Full-stack developer",
       "features": [
-        "Responsive service and portfolio pages",
-        "Mobile-friendly navigation",
-        "Clear contact and business information"
+        "Responsive conversational web interface",
+        "Automated portfolio and career responses",
+        "Backend health checks and gradual response generation"
       ],
-      "impact": "Created a professional web presence for an engineering-focused brand.",
-      "challenge": "Organizing business information into a clean, maintainable website structure.",
-      "link": "https://github.com/yourusername/project1"
+      "impact": "Created an interactive way for recruiters and visitors to explore my professional profile.",
+      "challenge": "Presenting structured career information through a natural conversational experience.",
+      "link": "https://github.com/AshelyJT/Personal--Assistant-Bot"
     },
     {
-      "name": "Web Portfolio",
-      "description": "Personal responsive portfolio showcasing skills, projects, services, and contact information.",
-      "technologies": ["HTML", "CSS", "JavaScript", "Flask"],
-      "role": "Designer and full-stack developer",
+      "name": "ICT Asset Management System",
+      "description": "System concept focused on tracking ICT assets, improving documentation, and supporting IT operations.",
+      "technologies": ["Database Systems", "Web Development", "ICT Support"],
+      "role": "Software developer",
       "features": [
-        "Responsive portfolio sections",
-        "Accessible navigation and contact experience",
-        "Integrated personal assistant"
+        "ICT asset tracking",
+        "Operational documentation support",
+        "IT asset movement and reporting workflows"
       ],
-      "impact": "Brought my professional profile and interactive resume assistant into one experience.",
-      "challenge": "Combining a content-rich portfolio with a focused conversational interface.",
+      "impact": "Supported clearer ICT asset records and operational processes.",
+      "challenge": "Organizing asset information into reliable workflows that support day-to-day ICT operations.",
       "link": ""
     },
     {
-      "name": "Campus VibeMarket",
-      "description": "E-commerce mobile app for campus trading.",
-      "technologies": ["Flutter", "Dart", "Firebase"],
-      "role": "Mobile app developer",
+      "name": "Portfolio Website",
+      "description": "Personal portfolio website showcasing skills, projects, certifications, experience, and contact information.",
+      "technologies": ["HTML", "CSS", "JavaScript"],
+      "role": "Designer and front-end developer",
       "features": [
-        "Campus marketplace listing flow",
-        "Cross-platform mobile UI",
-        "Firebase-backed app services"
+        "Responsive professional profile",
+        "Structured skills, projects, certifications, and experience",
+        "Integrated personal assistant interface"
       ],
-      "impact": "Designed to make student-to-student buying and selling easier on campus.",
-      "challenge": "Balancing a simple mobile experience with enough structure for marketplace trust.",
-      "link": "https://github.com/yourusername/project2"
+      "impact": "Provides recruiters and collaborators with a clear overview of my graduate engineering profile.",
+      "challenge": "Presenting broad technical experience in a focused, responsive, and accessible format.",
+      "link": "https://github.com/AshelyJT/Personal--Assistant-Bot"
+    },
+    {
+      "name": "Creatificant",
+      "description": "Responsive business website for a Zimbabwean creative design, printing, apparel branding, and promotional products company.",
+      "technologies": ["HTML", "CSS", "JavaScript", "Responsive Design", "Netlify"],
+      "role": "Front-end developer",
+      "features": [
+        "Responsive services and portfolio showcase",
+        "Mobile-friendly navigation and branded visual design",
+        "Email-based project quote request workflow"
+      ],
+      "impact": "Created a professional online presence that helps customers understand the company's services and request project quotations.",
+      "challenge": "Presenting several creative services and product categories through a distinctive, responsive, and easy-to-navigate interface.",
+      "link": "https://creatificant.netlify.app/"
     }
   ],
+  "certifications": {
+    "AI & Data": ["Machine Learning", "Data Science", "Generative AI"],
+    "Software Development": ["Programming", "Web Development", "Databases", "Software Engineering Concepts"],
+    "Cloud, Infrastructure & DevOps": ["Oracle Cloud", "Cloud Fundamentals", "Infrastructure", "DevOps Concepts"]
+  },
   "behavioral_responses": [
     {
       "tags": ["challenge", "difficult", "problem", "bug"],
-      "response": "During my internship at OK Zimbabwe, I faced a challenge automating a legacy workflow. I broke the problem down, researched Python automation libraries, and built a tool that saved the team 5 hours per week."
+      "response": "During my internship at OK Zimbabwe, I contributed to ICT asset tracking and system enhancement work. I approached technical issues by gathering requirements, breaking the workflow into smaller parts, testing carefully, and documenting the solution for users."
     },
     {
       "tags": ["teamwork", "collaboration", "conflict"],
-      "response": "I believe in open communication. working on the Campus VibeMarket app, we had conflicting ideas on UI design. I organized a user testing session which provided data to make the final decision objectively."
+      "response": "During industrial attachment, I worked with users and ICT team members to understand support issues, communicate progress clearly, and resolve hardware, software, networking, and account-related problems."
     },
     {
       "tags": ["leadership", "initiative"],
-      "response": "I take initiative by identifying gaps. At university, I often lead study groups and help organize coding resources for my peers in Computer Systems Engineering."
+      "response": "I take initiative by identifying practical gaps and turning them into structured technical solutions, as demonstrated by my SmartShelf dissertation and ICT asset management work."
     }
   ],
   "technical_deep_dives": {
-    "python": "I use Python for both data analysis (Pandas) and backend web development (Django/Flask). I focus on writing clean, PEP-8 compliant code.",
-    "django": "My experience with Django includes building the Asset Management System, handling ORM relationships, and implementing user authentication.",
-    "flutter": "I use Flutter for cross-platform mobile development, managing state effectively and integrating with Firebase for backend services."
+    "python": "I use Python for backend development, machine learning, data work, automation, and IoT-connected applications.",
+    "django": "My Django experience includes backend development, database models, enterprise workflows, reporting, and the SmartShelf web platform.",
+    "cloud": "My cloud learning includes Oracle Cloud and foundational cloud infrastructure and DevOps concepts.",
+    "cybersecurity": "My cybersecurity foundation includes security awareness, monitoring, best practices, and experience supporting users and enterprise ICT operations.",
+    "iot": "My IoT experience includes ESP32 microcontrollers, MQTT communication, embedded systems, and real-time digital shelf displays."
   }
 }
