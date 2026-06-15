@@ -153,12 +153,7 @@ const ASSISTANT_HEALTH_TIMEOUT_MS = 75000;
 const ASSISTANT_HEALTH_RETRY_MS = 3000;
 const ASSISTANT_HEALTH_REQUEST_TIMEOUT_MS = 10000;
 const ASSISTANT_TYPEWRITER_WORD_DELAY_MS = 45;
-const ASSISTANT_WAKE_MESSAGES = [
-    "The assistant is waking up. This may take a moment.",
-    "Connecting to the assistant service...",
-    "Loading portfolio knowledge and project details...",
-    "Almost ready. Thank you for waiting..."
-];
+const ASSISTANT_WAKE_MESSAGE = "The first connection can take up to a minute while the service starts.";
 
 const assistantDrawer = document.getElementById("assistant-drawer");
 const assistantBackdrop = document.getElementById("assistant-backdrop");
@@ -171,11 +166,12 @@ const assistantSend = document.getElementById("assistant-send");
 const assistantWakeStatus = document.getElementById("assistant-wake-status");
 const assistantWakeTitle = document.getElementById("assistant-wake-title");
 const assistantWakeMessage = document.getElementById("assistant-wake-message");
+const assistantWakeSteps = document.getElementById("assistant-wake-steps");
 const assistantRetry = document.getElementById("assistant-retry");
 let assistantBusy = false;
 let assistantHealthState = "idle";
 let assistantHealthPromise = null;
-let assistantWakeMessageTimer = null;
+let assistantWakeProgressTimer = null;
 
 function setAssistantState(isOpen) {
     if (!assistantDrawer || !assistantBackdrop || !assistantLauncher) return;
@@ -294,12 +290,13 @@ async function ensureAssistantReady() {
     assistantHealthState = "checking";
     setAssistantAvailability(false);
     showAssistantWakeStatus();
-    startAssistantWakeMessages();
+    startAssistantWakeProgress();
 
     assistantHealthPromise = checkAssistantHealth()
         .then(() => {
             assistantHealthState = "ready";
-            stopAssistantWakeMessages();
+            stopAssistantWakeProgress();
+            setAssistantWakeStep(2);
             hideAssistantWakeStatus();
             setAssistantAvailability(true);
             assistantInput?.focus();
@@ -307,7 +304,7 @@ async function ensureAssistantReady() {
         })
         .catch(() => {
             assistantHealthState = "delayed";
-            stopAssistantWakeMessages();
+            stopAssistantWakeProgress();
             showAssistantDelayedStatus();
             setAssistantAvailability(false);
             return false;
@@ -373,7 +370,8 @@ function showAssistantWakeStatus() {
     assistantWakeStatus.hidden = false;
     assistantWakeStatus.classList.remove("is-delayed");
     assistantWakeTitle.textContent = "Starting Ashely JT Assistant...";
-    assistantWakeMessage.textContent = ASSISTANT_WAKE_MESSAGES[0];
+    assistantWakeMessage.textContent = ASSISTANT_WAKE_MESSAGE;
+    setAssistantWakeStep(0);
     if (assistantRetry) assistantRetry.hidden = true;
 }
 
@@ -387,26 +385,34 @@ function showAssistantDelayedStatus() {
     assistantWakeStatus.hidden = false;
     assistantWakeStatus.classList.add("is-delayed");
     assistantWakeTitle.textContent = "Still connecting";
-    assistantWakeMessage.textContent = "The assistant is taking longer than usual. You can wait a moment or try again.";
+    assistantWakeMessage.textContent = "The service did not respond within 75 seconds. You can try the connection again.";
+    setAssistantWakeStep(1);
     if (assistantRetry) assistantRetry.hidden = false;
 }
 
-function startAssistantWakeMessages() {
-    stopAssistantWakeMessages();
-    let messageIndex = 0;
+function setAssistantWakeStep(activeIndex) {
+    if (!assistantWakeSteps) return;
 
-    assistantWakeMessageTimer = window.setInterval(() => {
-        messageIndex = (messageIndex + 1) % ASSISTANT_WAKE_MESSAGES.length;
-        if (assistantWakeMessage) {
-            assistantWakeMessage.textContent = ASSISTANT_WAKE_MESSAGES[messageIndex];
-        }
-    }, 3500);
+    assistantWakeSteps.querySelectorAll("li").forEach((step, index) => {
+        step.classList.toggle("is-complete", index < activeIndex);
+        step.classList.toggle("is-active", index === activeIndex);
+    });
 }
 
-function stopAssistantWakeMessages() {
-    if (!assistantWakeMessageTimer) return;
-    window.clearInterval(assistantWakeMessageTimer);
-    assistantWakeMessageTimer = null;
+function startAssistantWakeProgress() {
+    stopAssistantWakeProgress();
+    const startedAt = Date.now();
+
+    assistantWakeProgressTimer = window.setInterval(() => {
+        const elapsed = Date.now() - startedAt;
+        setAssistantWakeStep(elapsed >= 7000 ? 1 : 0);
+    }, 1000);
+}
+
+function stopAssistantWakeProgress() {
+    if (!assistantWakeProgressTimer) return;
+    window.clearInterval(assistantWakeProgressTimer);
+    assistantWakeProgressTimer = null;
 }
 
 function appendAssistantMessage(message, sender) {
@@ -551,6 +557,7 @@ function formatAssistantResponse(text) {
     const lines = text.split(/\r?\n/);
     const blocks = [];
     let listItems = [];
+    let numberedSectionCount = 0;
 
     const flushList = () => {
         if (!listItems.length) return;
@@ -570,6 +577,21 @@ function formatAssistantResponse(text) {
         }
         flushList();
         const heading = line.match(/^\*\*(.+?)\*\*$/);
+        if (heading) {
+            const numberedHeading = heading[1].match(/^(\d+)\.\s+(.+)$/);
+            if (numberedHeading) {
+                if (numberedSectionCount > 0) {
+                    blocks.push('<hr class="assistant-response-divider">');
+                }
+                numberedSectionCount += 1;
+                blocks.push(
+                    '<h3 class="assistant-project-heading">'
+                    + `<span>${numberedHeading[1].padStart(2, "0")}</span>`
+                    + `${formatAssistantInline(numberedHeading[2])}</h3>`
+                );
+                return;
+            }
+        }
         blocks.push(heading
             ? `<h3>${formatAssistantInline(heading[1])}</h3>`
             : `<p>${formatAssistantInline(line)}</p>`);

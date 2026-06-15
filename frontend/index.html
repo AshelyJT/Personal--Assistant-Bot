@@ -510,7 +510,12 @@
             </div>
             <div>
                 <strong id="assistant-wake-title">Starting Ashely JT Assistant...</strong>
-                <p id="assistant-wake-message">The assistant is waking up. This may take a moment.</p>
+                <p id="assistant-wake-message">The first connection can take up to a minute while the service starts.</p>
+                <ol class="assistant-wake-steps" id="assistant-wake-steps" aria-label="Assistant connection progress">
+                    <li class="is-active">Connecting</li>
+                    <li>Starting service</li>
+                    <li>Ready</li>
+                </ol>
                 <button id="assistant-retry" type="button" aria-label="Retry connecting to the portfolio assistant" hidden>Try again</button>
             </div>
         </div>

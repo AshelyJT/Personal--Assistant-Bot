@@ -88,7 +88,8 @@ class ChatEndpointTestCase(unittest.TestCase):
 
         self.assertIn("Ashely JT Assistant", html)
         self.assertIn("Starting Ashely JT Assistant...", html)
-        self.assertIn("The assistant is waking up. This may take a moment.", html)
+        self.assertIn("The first connection can take up to a minute while the service starts.", html)
+        self.assertIn('class="assistant-wake-steps"', html)
         self.assertIn('<div class="assistant-loader" aria-hidden="true">', html)
         self.assertIn("@keyframes assistantLoaderProgress", stylesheet)
         self.assertNotIn("@keyframes assistantLoaderSpin", stylesheet)
@@ -113,10 +114,10 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn('grid-template-areas:', stylesheet)
         self.assertIn('grid-area: suggestions;', stylesheet)
         self.assertIn('.assistant-bubble.is-generating::after', stylesheet)
-        self.assertIn(
-            "The assistant is taking longer than usual. You can wait a moment or try again.",
-            script,
-        )
+        self.assertIn("startAssistantWakeProgress()", script)
+        self.assertNotIn("ASSISTANT_WAKE_MESSAGES", script)
+        self.assertIn('class="assistant-response-divider"', script)
+        self.assertIn('class="assistant-project-heading"', script)
 
     def test_health_endpoint_and_cors_headers(self):
         response = self.client.get("/health", headers={"Origin": "https://takudzwa-john.tech"})
@@ -170,6 +171,8 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(payload["intent"], "projects")
         self.assertIn("Here are all 5 projects", payload["response"])
+        self.assertIn("**1. SmartShelf AI**", payload["response"])
+        self.assertIn("**5. Creatificant**", payload["response"])
         for project in (
             "SmartShelf AI",
             "AI Personal Assistant Chatbot",

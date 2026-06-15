@@ -261,11 +261,11 @@ class AdvancedPersonalAssistant:
 
         if not filtered_projects:
             project_overview = []
-            for project in projects:
+            for index, project in enumerate(projects, start=1):
                 name = project.get("name", "Project")
                 description = project.get("description", "Software project").rstrip(".")
                 technologies = ", ".join(project.get("technologies", [])[:5])
-                summary = f"**{name}**\n{description}."
+                summary = f"**{index}. {name}**\n{description}."
                 if technologies:
                     summary += f"\n\nBuilt with **{technologies}**."
                 link = project.get("link")
