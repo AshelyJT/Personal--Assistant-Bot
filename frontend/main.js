@@ -2,6 +2,7 @@ const menuButton = document.getElementById("menu-button");
 const mobileNav = document.getElementById("sideBar");
 const menuBackdrop = document.getElementById("menu-backdrop");
 const siteHeader = document.querySelector(".site-header");
+const ASSISTANT_API_BASE_URL = "https://personal-assistant-bot-y2ye.onrender.com";
 
 function setMenuState(isOpen) {
     if (!menuButton || !mobileNav) return;
@@ -104,8 +105,8 @@ if ("IntersectionObserver" in window && !reducedMotion) {
     animatedElements.forEach((element) => element.classList.add("visible"));
 }
 
-const scriptURL = "https://script.google.com/macros/s/AKfycbwp-cEadhXFnp-sazapIqnGvG8pmF21cdy6CpwjTqs7GkzlWe6W5Oui1xEBsuJNnPF8/exec";
-const form = document.forms["submit-to-google-sheet"];
+const CONTACT_API_URL = `${ASSISTANT_API_BASE_URL}/contact`;
+const form = document.forms["portfolio-contact-form"];
 const submitButton = document.getElementById("submit-button");
 const formStatus = document.getElementById("form-status");
 
@@ -118,21 +119,28 @@ form?.addEventListener("submit", async (event) => {
     formStatus.textContent = "Sending your message...";
 
     try {
-        const response = await fetch(scriptURL, {
+        const formData = new FormData(form);
+        const response = await fetch(CONTACT_API_URL, {
             method: "POST",
-            body: new FormData(form)
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: formData.get("Name"),
+                email: formData.get("Email"),
+                message: formData.get("Message")
+            })
         });
 
+        const result = await response.json().catch(() => ({}));
         if (!response.ok) {
-            throw new Error("Message submission failed");
+            throw new Error(result.response || "Message submission failed");
         }
 
         form.reset();
         formStatus.classList.add("success");
-        formStatus.textContent = "Your message was sent successfully. Thank you.";
-    } catch {
+        formStatus.textContent = result.response || "Your message was sent successfully. Thank you.";
+    } catch (error) {
         formStatus.classList.add("error");
-        formStatus.textContent = "Your message could not be sent. Please try again or use the contact details provided.";
+        formStatus.textContent = error.message || "Your message could not be sent. Please try again or use the contact details provided.";
     } finally {
         submitButton.disabled = false;
         submitButton.textContent = "Send Message";
@@ -179,7 +187,6 @@ document.addEventListener("keydown", (event) => {
 const currentYear = document.getElementById("currentYear");
 if (currentYear) currentYear.textContent = new Date().getFullYear();
 
-const ASSISTANT_API_BASE_URL = "https://personal-assistant-bot-y2ye.onrender.com";
 const ASSISTANT_HEALTH_TIMEOUT_MS = 75000;
 const ASSISTANT_HEALTH_RETRY_MS = 3000;
 const ASSISTANT_HEALTH_REQUEST_TIMEOUT_MS = 10000;

@@ -10,3 +10,5 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.15"
+      - key: CONTACT_RECIPIENT_EMAIL
+        value: "takudzwajohn3275@gmail.com"

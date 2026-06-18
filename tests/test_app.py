@@ -1,5 +1,6 @@
 import re
 import unittest
+from unittest.mock import patch
 
 from backend.app import app
 
@@ -97,6 +98,7 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn(".mobile-assistant-arrow", stylesheet)
         self.assertIn(".experience-list::before", stylesheet)
         self.assertIn("@keyframes experienceBeacon", stylesheet)
+        self.assertIn('name="portfolio-contact-form"', html)
         self.assertNotIn('href=""', html)
         self.assertIsNone(re.search(r"\bto\s+to\b", html, re.IGNORECASE))
         self.assertNotIn("perfomance", html.lower())
@@ -123,6 +125,13 @@ class ChatEndpointTestCase(unittest.TestCase):
         )
         self.assertIn("`${ASSISTANT_API_BASE_URL}/health`", script)
         self.assertIn("`${ASSISTANT_API_BASE_URL}/chat`", script)
+        self.assertIn("`${ASSISTANT_API_BASE_URL}/contact`", script)
+        self.assertIn("portfolio-contact-form", script)
+        self.assertNotIn("script.google.com", script)
+        self.assertLess(
+            script.index("const ASSISTANT_API_BASE_URL"),
+            script.index("const CONTACT_API_URL"),
+        )
         self.assertIn("ASSISTANT_HEALTH_RETRY_MS", script)
         self.assertIn("while (Date.now() < deadline)", script)
         self.assertIn("ASSISTANT_TYPEWRITER_WORD_DELAY_MS", script)
@@ -170,6 +179,48 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
         self.assertEqual(response.headers["Access-Control-Allow-Headers"], "Content-Type")
+
+    def test_contact_endpoint_sends_valid_message(self):
+        with patch("backend.app.send_contact_email") as send_email:
+            response = self.client.post(
+                "/contact",
+                json={
+                    "name": "Jane Recruiter",
+                    "email": "jane@example.com",
+                    "message": "Hello, can we schedule an interview?",
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("sent successfully", response.get_json()["response"])
+        send_email.assert_called_once_with(
+            "Jane Recruiter",
+            "jane@example.com",
+            "Hello, can we schedule an interview?",
+        )
+
+    def test_contact_endpoint_validates_required_fields(self):
+        response = self.client.post(
+            "/contact",
+            json={"name": "Jane Recruiter", "email": "not-an-email", "message": "Hello"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("valid email", response.get_json()["response"])
+
+    def test_contact_endpoint_reports_missing_email_configuration(self):
+        with patch("backend.app.send_contact_email", side_effect=RuntimeError("missing SMTP")):
+            response = self.client.post(
+                "/contact",
+                json={
+                    "name": "Jane Recruiter",
+                    "email": "jane@example.com",
+                    "message": "Hello",
+                },
+            )
+
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("not configured", response.get_json()["response"])
 
     def test_chat_returns_structured_answer(self):
         response = self.post_chat("What are your technical skills?")

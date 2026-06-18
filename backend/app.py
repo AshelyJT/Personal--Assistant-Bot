@@ -1,5 +1,9 @@
-from flask import Flask, request, jsonify, send_from_directory
 import os
+import re
+import smtplib
+from email.message import EmailMessage
+
+from flask import Flask, request, jsonify, send_from_directory
 
 try:
     from .nlp_bot import AdvancedPersonalAssistant
@@ -32,6 +36,76 @@ def home():
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok'})
+
+
+def clean_contact_field(value):
+    if not isinstance(value, str):
+        return ""
+    return value.strip()
+
+
+def is_valid_email(email):
+    return bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email))
+
+
+def send_contact_email(name, sender_email, message):
+    recipient = os.environ.get("CONTACT_RECIPIENT_EMAIL", "takudzwajohn3275@gmail.com")
+    smtp_host = os.environ.get("SMTP_HOST")
+    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+    smtp_username = os.environ.get("SMTP_USERNAME")
+    smtp_password = os.environ.get("SMTP_PASSWORD")
+    smtp_from = os.environ.get("SMTP_FROM_EMAIL") or smtp_username
+
+    if not all([smtp_host, smtp_username, smtp_password, smtp_from, recipient]):
+        raise RuntimeError("Contact email service is not configured.")
+
+    email = EmailMessage()
+    email["Subject"] = f"Portfolio contact message from {name}"
+    email["From"] = smtp_from
+    email["To"] = recipient
+    email["Reply-To"] = sender_email
+    email.set_content(
+        "\n".join([
+            "New message from your portfolio contact form.",
+            "",
+            f"Name: {name}",
+            f"Email: {sender_email}",
+            "",
+            "Message:",
+            message,
+        ])
+    )
+
+    with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as smtp:
+        smtp.starttls()
+        smtp.login(smtp_username, smtp_password)
+        smtp.send_message(email)
+
+
+@app.route('/contact', methods=['POST'])
+def contact():
+    payload = request.get_json(silent=True) or {}
+    name = clean_contact_field(payload.get("name"))
+    sender_email = clean_contact_field(payload.get("email"))
+    message = clean_contact_field(payload.get("message"))
+
+    if not name or not sender_email or not message:
+        return jsonify({"response": "Name, email, and message are required."}), 400
+    if len(name) > 120 or len(sender_email) > 254 or len(message) > 3000:
+        return jsonify({"response": "Your message is too long."}), 400
+    if not is_valid_email(sender_email):
+        return jsonify({"response": "Please enter a valid email address."}), 400
+
+    try:
+        send_contact_email(name, sender_email, message)
+    except RuntimeError as error:
+        app.logger.warning("Contact email configuration error: %s", error)
+        return jsonify({"response": "Contact email is not configured yet."}), 503
+    except Exception:
+        app.logger.exception("Contact email failed")
+        return jsonify({"response": "Your message could not be sent right now."}), 502
+
+    return jsonify({"response": "Your message was sent successfully."})
 
 
 @app.route('/chat', methods=['POST'])
