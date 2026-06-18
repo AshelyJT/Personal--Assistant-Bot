@@ -222,6 +222,48 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 503)
         self.assertIn("not configured", response.get_json()["response"])
 
+    @patch.dict(
+        "os.environ",
+        {
+            "RESEND_API_KEY": "test-api-key",
+            "RESEND_FROM_EMAIL": "Portfolio <portfolio@example.com>",
+            "CONTACT_RECIPIENT_EMAIL": "takudzwajohn3275@gmail.com",
+        },
+    )
+    @patch("backend.app.urllib_request.urlopen")
+    def test_contact_email_uses_resend_when_configured(self, urlopen):
+        urlopen.return_value.__enter__.return_value.status = 200
+
+        response = self.client.post(
+            "/contact",
+            json={
+                "name": "Jane Recruiter",
+                "email": "jane@example.com",
+                "message": "Hello from the portfolio.",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        request = urlopen.call_args.args[0]
+        self.assertEqual(request.full_url, "https://api.resend.com/emails")
+        self.assertEqual(request.headers["Authorization"], "Bearer test-api-key")
+        self.assertIn(b"Jane Recruiter", request.data)
+        self.assertIn(b"jane@example.com", request.data)
+
+    @patch.dict("os.environ", {"RESEND_API_KEY": "test-api-key"}, clear=True)
+    def test_contact_email_reports_incomplete_resend_configuration(self):
+        response = self.client.post(
+            "/contact",
+            json={
+                "name": "Jane Recruiter",
+                "email": "jane@example.com",
+                "message": "Hello",
+            },
+        )
+
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("not configured", response.get_json()["response"])
+
     def test_chat_returns_structured_answer(self):
         response = self.post_chat("What are your technical skills?")
         payload = response.get_json()

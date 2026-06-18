@@ -1,7 +1,10 @@
 import os
 import re
 import smtplib
+import json
 from email.message import EmailMessage
+from urllib import error as urllib_error
+from urllib import request as urllib_request
 
 from flask import Flask, request, jsonify, send_from_directory
 
@@ -48,7 +51,53 @@ def is_valid_email(email):
     return bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email))
 
 
-def send_contact_email(name, sender_email, message):
+def build_contact_email_body(name, sender_email, message):
+    return "\n".join([
+        "New message from your portfolio contact form.",
+        "",
+        f"Name: {name}",
+        f"Email: {sender_email}",
+        "",
+        "Message:",
+        message,
+    ])
+
+
+def send_contact_email_with_resend(name, sender_email, message):
+    recipient = os.environ.get("CONTACT_RECIPIENT_EMAIL", "takudzwajohn3275@gmail.com")
+    resend_api_key = os.environ.get("RESEND_API_KEY")
+    resend_from = os.environ.get("RESEND_FROM_EMAIL")
+
+    if not all([resend_api_key, resend_from, recipient]):
+        raise RuntimeError("Resend email service is not configured.")
+
+    payload = {
+        "from": resend_from,
+        "to": [recipient],
+        "subject": f"Portfolio contact message from {name}",
+        "reply_to": sender_email,
+        "text": build_contact_email_body(name, sender_email, message),
+    }
+    request = urllib_request.Request(
+        "https://api.resend.com/emails",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {resend_api_key}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib_request.urlopen(request, timeout=20) as response:
+            if response.status >= 400:
+                raise RuntimeError("Resend email request failed.")
+    except urllib_error.HTTPError as error:
+        details = error.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Resend email request failed: {details}") from error
+
+
+def send_contact_email_with_smtp(name, sender_email, message):
     recipient = os.environ.get("CONTACT_RECIPIENT_EMAIL", "takudzwajohn3275@gmail.com")
     smtp_host = os.environ.get("SMTP_HOST")
     smtp_port = int(os.environ.get("SMTP_PORT", "587"))
@@ -64,22 +113,20 @@ def send_contact_email(name, sender_email, message):
     email["From"] = smtp_from
     email["To"] = recipient
     email["Reply-To"] = sender_email
-    email.set_content(
-        "\n".join([
-            "New message from your portfolio contact form.",
-            "",
-            f"Name: {name}",
-            f"Email: {sender_email}",
-            "",
-            "Message:",
-            message,
-        ])
-    )
+    email.set_content(build_contact_email_body(name, sender_email, message))
 
     with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as smtp:
         smtp.starttls()
         smtp.login(smtp_username, smtp_password)
         smtp.send_message(email)
+
+
+def send_contact_email(name, sender_email, message):
+    if os.environ.get("RESEND_API_KEY"):
+        send_contact_email_with_resend(name, sender_email, message)
+        return
+
+    send_contact_email_with_smtp(name, sender_email, message)
 
 
 @app.route('/contact', methods=['POST'])
