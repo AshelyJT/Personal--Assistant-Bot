@@ -2,7 +2,7 @@ import re
 import unittest
 from unittest.mock import patch
 
-from backend.app import app
+from backend.app import ContactEmailConfigError, app
 
 
 class ChatEndpointTestCase(unittest.TestCase):
@@ -209,7 +209,7 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("valid email", response.get_json()["response"])
 
     def test_contact_endpoint_reports_missing_email_configuration(self):
-        with patch("backend.app.send_contact_email", side_effect=RuntimeError("missing SMTP")):
+        with patch("backend.app.send_contact_email", side_effect=ContactEmailConfigError("missing SMTP")):
             response = self.client.post(
                 "/contact",
                 json={
@@ -247,6 +247,7 @@ class ChatEndpointTestCase(unittest.TestCase):
         request = urlopen.call_args.args[0]
         self.assertEqual(request.full_url, "https://api.resend.com/emails")
         self.assertEqual(request.headers["Authorization"], "Bearer test-api-key")
+        self.assertEqual(request.headers["User-agent"], "TakudzwaJohnPortfolio/1.0")
         self.assertIn(b"Jane Recruiter", request.data)
         self.assertIn(b"jane@example.com", request.data)
 

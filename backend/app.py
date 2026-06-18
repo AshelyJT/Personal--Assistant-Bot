@@ -23,6 +23,14 @@ app = Flask(__name__, static_folder=frontend_dir, static_url_path="")
 bot = AdvancedPersonalAssistant()
 
 
+class ContactEmailConfigError(RuntimeError):
+    pass
+
+
+class ContactEmailProviderError(RuntimeError):
+    pass
+
+
 @app.after_request
 def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -69,7 +77,7 @@ def send_contact_email_with_resend(name, sender_email, message):
     resend_from = os.environ.get("RESEND_FROM_EMAIL")
 
     if not all([resend_api_key, resend_from, recipient]):
-        raise RuntimeError("Resend email service is not configured.")
+        raise ContactEmailConfigError("Resend email service is not configured.")
 
     payload = {
         "from": resend_from,
@@ -84,6 +92,8 @@ def send_contact_email_with_resend(name, sender_email, message):
         headers={
             "Authorization": f"Bearer {resend_api_key}",
             "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "TakudzwaJohnPortfolio/1.0",
         },
         method="POST",
     )
@@ -91,10 +101,10 @@ def send_contact_email_with_resend(name, sender_email, message):
     try:
         with urllib_request.urlopen(request, timeout=20) as response:
             if response.status >= 400:
-                raise RuntimeError("Resend email request failed.")
+                raise ContactEmailProviderError("Resend email request failed.")
     except urllib_error.HTTPError as error:
         details = error.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Resend email request failed: {details}") from error
+        raise ContactEmailProviderError(f"Resend email request failed: {details}") from error
 
 
 def send_contact_email_with_smtp(name, sender_email, message):
@@ -106,7 +116,7 @@ def send_contact_email_with_smtp(name, sender_email, message):
     smtp_from = os.environ.get("SMTP_FROM_EMAIL") or smtp_username
 
     if not all([smtp_host, smtp_username, smtp_password, smtp_from, recipient]):
-        raise RuntimeError("Contact email service is not configured.")
+        raise ContactEmailConfigError("Contact email service is not configured.")
 
     email = EmailMessage()
     email["Subject"] = f"Portfolio contact message from {name}"
@@ -145,9 +155,12 @@ def contact():
 
     try:
         send_contact_email(name, sender_email, message)
-    except RuntimeError as error:
+    except ContactEmailConfigError as error:
         app.logger.warning("Contact email configuration error: %s", error)
         return jsonify({"response": "Contact email is not configured yet."}), 503
+    except ContactEmailProviderError:
+        app.logger.exception("Contact email provider rejected the message")
+        return jsonify({"response": "The contact email service rejected the message. Please try again later."}), 502
     except Exception:
         app.logger.exception("Contact email failed")
         return jsonify({"response": "Your message could not be sent right now."}), 502
