@@ -42,7 +42,24 @@ class AdvancedPersonalAssistant:
             "greeting": ["hello", "hi", "hey", "greetings"],
             "about": ["about", "yourself", "who are you", "summary", "profile", "intro"],
             "skills": ["skills", "technologies", "stack", "programming", "languages", "tools", "networking", "support"],
-            "experience": ["experience", "work", "job", "internship", "attachment", "career", "ok zimbabwe"],
+            "experience": [
+                "experience",
+                "work",
+                "job",
+                "internship",
+                "attachment",
+                "career",
+                "ok zimbabwe",
+                "midlands state university",
+                "msu",
+                "student on employment",
+                "it department",
+                "technical support",
+                "hardware",
+                "troubleshooting",
+                "networking support",
+                "networking",
+            ],
             "education": ["education", "degree", "graduate", "graduation", "university", "college", "school", "msu"],
             "projects": ["projects", "portfolio", "apps", "website", "smartshelf", "chatbot", "asset management", "asset tracking", "creatificant", "codegenius"],
             "certifications": ["certification", "certifications", "certificate", "certificates", "credential", "credentials"],
@@ -192,9 +209,9 @@ class AdvancedPersonalAssistant:
                 "Tell me about your tools and libraries",
             ],
             "experience": [
-                "What achievements are you proud of?",
-                "What ICT support experience do you have?",
-                "What did you do at OK Zimbabwe?",
+                "Summarize MSU IT experience",
+                "Show technical support experience",
+                "Show networking experience",
             ],
             "projects": [
                 "Tell me about SmartShelf AI",
@@ -389,6 +406,71 @@ class AdvancedPersonalAssistant:
 
         return "A couple of achievements I am especially proud of are:\n\n" + "\n".join(achievements)
 
+    def format_experience(self, query=""):
+        roles = self.data.get("experience", [])
+        if not roles:
+            return "I do not have experience details available yet."
+
+        text = query.lower()
+        matching_roles = []
+        explicit_msu_query = any(
+            term in text
+            for term in ["midlands", "msu", "student on employment", "university"]
+        )
+        explicit_ok_query = any(
+            term in text
+            for term in ["ok zimbabwe", "internship", "attachment", "industrial"]
+        )
+        support_query = any(
+            term in text
+            for term in ["hardware", "networking", "technical support", "troubleshooting"]
+        )
+
+        for role in roles:
+            searchable = " ".join(
+                [
+                    role.get("company", ""),
+                    role.get("role", ""),
+                    role.get("description", ""),
+                    " ".join(role.get("achievements", [])),
+                ]
+            ).lower()
+
+            if explicit_msu_query:
+                if any(term in searchable for term in ["midlands", "student on employment"]):
+                    matching_roles.append(role)
+                    continue
+
+            if explicit_ok_query:
+                if "ok zimbabwe" in searchable or "ict intern" in searchable:
+                    matching_roles.append(role)
+                    continue
+
+            if support_query:
+                if any(term in searchable for term in ["hardware", "networking", "technical support", "troubleshooting", "user support"]):
+                    matching_roles.append(role)
+                    continue
+
+        selected_roles = matching_roles or roles
+        summaries = []
+
+        for role in selected_roles:
+            summary = (
+                f"**{role.get('role', 'ICT Experience')} - {role.get('company', 'Organization')}**\n"
+                f"{role.get('duration', 'Listed period')}"
+            )
+            description = role.get("description", "").strip()
+            if description:
+                summary += f"\n\n{description}"
+            achievements = role.get("achievements", [])
+            if achievements:
+                summary += "\n\nResponsibilities included:\n" + "\n".join(
+                    f"- {achievement}" for achievement in achievements
+                )
+            summaries.append(summary)
+
+        return "\n\n".join(summaries)
+
     def get_response(self, user_input):
         if not user_input or not user_input.strip():
             return "Please ask me something about my skills, projects, experience, or education."
@@ -423,24 +505,7 @@ class AdvancedPersonalAssistant:
             return self.format_skills()
 
         if intent == "experience":
-            role = self.get_first_item("experience")
-            if not role:
-                return "I do not have experience details available yet."
-            achievements = role.get("achievements", [])
-            description = role.get("description", "").strip()
-            if description:
-                description = description[0].lower() + description[1:]
-            response = (
-                f"I worked as an **{role.get('role', 'ICT Intern')}** at "
-                f"**{role.get('company', 'OK Zimbabwe Limited')}** from "
-                f"{role.get('duration', 'the listed period')}. "
-                f"During that time, {description}"
-            )
-            if achievements:
-                response += "\n\nMy responsibilities included:\n" + "\n".join(
-                    f"- {achievement}" for achievement in achievements
-                )
-            return response
+            return self.format_experience(user_input)
 
         if intent == "projects":
             return self.format_projects(user_input)

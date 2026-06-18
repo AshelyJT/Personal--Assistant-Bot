@@ -24,7 +24,7 @@ class ChatEndpointTestCase(unittest.TestCase):
     def test_portfolio_assets_and_resume_are_served(self):
         stylesheet = self.client.get("/style.css")
         portrait = self.client.get("/images/me.jpg")
-        resume = self.client.get("/files/Takudzwa-Ashely-John-CV.pdf")
+        resume = self.client.get("/files/Takudzwa%20John%20CV.pdf")
         robots = self.client.get("/robots.txt")
         sitemap = self.client.get("/sitemap.xml")
         favicon = self.client.get("/favicon.svg")
@@ -56,6 +56,14 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn('id="experience"', html)
         self.assertIn('id="certifications"', html)
         self.assertIn("OK Zimbabwe Limited", html)
+        self.assertIn("Midlands State University", html)
+        self.assertIn("Student on Employment Programme, IT Department", html)
+        self.assertIn('class="experience-list"', html)
+        self.assertIn("August 2023 - June 2024", html)
+        self.assertIn("August 2025 - June 2026", html)
+        self.assertIn("Summarize MSU IT experience", html)
+        self.assertIn("Show technical support experience", html)
+        self.assertIn("Show networking experience", html)
         self.assertIn("project-based collaboration rather than formal employment", html)
         self.assertIn("Computer Systems Engineering Graduate", html)
         self.assertIn("takudzwajohn3275@gmail.com", html)
@@ -80,13 +88,15 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn('src="./main.js" defer', html)
         self.assertIn('rel="icon" type="image/svg+xml" href="./favicon.svg"', html)
         self.assertNotIn("fonts.cdnfonts.com", html)
-        self.assertIn('href="./files/Takudzwa-Ashely-John-CV.pdf"', html)
+        self.assertIn('href="./files/Takudzwa%20John%20CV.pdf"', html)
         self.assertIn('label class="sr-only" for="assistant-input"', html)
         self.assertIn('aria-label="Open navigation menu"', html)
         self.assertIn('class="mobile-assistant-icon"', html)
         self.assertIn("Explore my skills and projects", html)
         self.assertIn(".mobile-assistant-copy", stylesheet)
         self.assertIn(".mobile-assistant-arrow", stylesheet)
+        self.assertIn(".experience-list::before", stylesheet)
+        self.assertIn("@keyframes experienceBeacon", stylesheet)
         self.assertNotIn('href=""', html)
         self.assertIsNone(re.search(r"\bto\s+to\b", html, re.IGNORECASE))
         self.assertNotIn("perfomance", html.lower())
@@ -280,6 +290,42 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("OK Zimbabwe Limited", payload["response"])
         self.assertIn("network support", payload["response"])
         self.assertIn("cybersecurity awareness", payload["response"])
+
+    def test_msu_student_on_employment_experience(self):
+        response = self.post_chat("What experience does Takudzwa have at Midlands State University?")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "experience")
+        self.assertIn("Student on Employment Programme", payload["response"])
+        self.assertIn("Midlands State University", payload["response"])
+        self.assertIn("university staff and students", payload["response"])
+
+    def test_student_on_employment_programme_question(self):
+        response = self.post_chat("What is the Student on Employment Programme?")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["intent"], "experience")
+        self.assertIn("while studying", payload["response"])
+        self.assertIn("professional IT support duties", payload["response"])
+
+    def test_technical_support_hardware_and_networking_questions(self):
+        questions = [
+            "What technical support experience does Takudzwa have?",
+            "Does Takudzwa have hardware troubleshooting experience?",
+            "Does Takudzwa have networking support experience?",
+        ]
+
+        for question in questions:
+            response = self.post_chat(question)
+            payload = response.get_json()
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(payload["intent"], "experience")
+            self.assertIn("Midlands State University", payload["response"])
+            self.assertIn("technical support", payload["response"].lower())
+            self.assertIn("Networking Department", payload["response"])
 
     def test_skills_response_is_conversational(self):
         response = self.post_chat("What are your technical skills?")
