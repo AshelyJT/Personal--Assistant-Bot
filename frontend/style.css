@@ -372,6 +372,53 @@ a {
     font-size: clamp(1rem, 2.5vw, 1.18rem);
 }
 
+.hero-interests {
+    max-width: 680px;
+    margin-top: 1.35rem;
+    padding: 1rem;
+    border: 1px solid rgba(25, 220, 230, 0.16);
+    background: linear-gradient(135deg, rgba(25, 220, 230, 0.09), rgba(255, 255, 255, 0.025));
+    border-radius: var(--radius-md);
+}
+
+.hero-interests h2 {
+    margin-bottom: 0.75rem;
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.hero-interests ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    list-style: none;
+}
+
+.hero-interests li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid rgba(25, 220, 230, 0.18);
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--text);
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 650;
+}
+
+.hero-interests li::before {
+    width: 0.38rem;
+    height: 0.38rem;
+    content: "";
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 14px rgba(25, 220, 230, 0.55);
+}
+
 .hero-contact {
     margin-top: 1.15rem;
     display: flex;
@@ -860,12 +907,70 @@ a {
     gap: 1.25rem;
 }
 
-.certification-card span {
-    display: block;
-    margin-bottom: 1.5rem;
+.certification-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.certification-card-header {
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.certification-card-header span {
     color: var(--accent);
     font-family: ui-monospace, "Cascadia Code", monospace;
     font-size: 0.85rem;
+}
+
+.certification-status {
+    margin: 0;
+    padding: 0.28rem 0.65rem;
+    border: 1px solid rgba(25, 220, 230, 0.18);
+    background: var(--accent-soft);
+    color: #bdfaff;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.certification-list {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.65rem;
+    list-style: none;
+}
+
+.certification-list li {
+    position: relative;
+    padding-left: 1.05rem;
+    color: var(--text);
+    font-size: 0.94rem;
+    line-height: 1.5;
+}
+
+.certification-list li::before {
+    position: absolute;
+    top: 0.64rem;
+    left: 0;
+    width: 0.4rem;
+    height: 0.4rem;
+    content: "";
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 14px rgba(25, 220, 230, 0.45);
+}
+
+.certification-card .certification-note {
+    margin-top: auto;
+    padding-top: 1rem;
+    color: var(--text-muted);
+    font-size: 0.84rem;
 }
 
 .skill-bars,

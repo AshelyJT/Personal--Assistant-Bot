@@ -281,8 +281,10 @@ class AdvancedPersonalAssistant:
             if items
         ]
         return (
-            "My certifications and professional learning are grouped into these areas:\n\n"
+            "My certifications and professional learning show continued growth across AI, "
+            "data, software development, cloud, DevOps, networking, and database systems:\n\n"
             + "\n".join(groups)
+            + "\n\nCertificate files are available on request."
         )
 
     def format_codegenius_collaboration(self):

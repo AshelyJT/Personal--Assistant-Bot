@@ -171,9 +171,27 @@
     }
   ],
   "certifications": {
-    "AI & Data": ["Machine Learning", "Data Science", "Generative AI"],
-    "Software Development": ["Programming", "Web Development", "Databases", "Software Engineering Concepts"],
-    "Cloud, Infrastructure & DevOps": ["Oracle Cloud", "Cloud Fundamentals", "Infrastructure", "DevOps Concepts"]
+    "AI & Data": [
+      "AI Vector Search Certified Professional",
+      "Certified AI Foundations Associate",
+      "Certified Data Science Professional",
+      "Certified Generative AI Professional"
+    ],
+    "Software Development": [
+      "Certified Developer Professional",
+      "Certified Python & Django Developer"
+    ],
+    "Cloud, Infrastructure & DevOps": [
+      "Certified Foundations Associate",
+      "Certified DevOps Professional",
+      "Certified Multicloud Architect Professional",
+      "Certified Networking Professional"
+    ],
+    "Data Platforms & Databases": [
+      "Data Platform 2025 Certified Foundations Associate",
+      "Oracle Cloud Database Services 2025 Certified Professional",
+      "Oracle Database@AWS Certified Architect Professional"
+    ]
   },
   "behavioral_responses": [
     {
