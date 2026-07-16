@@ -79,7 +79,7 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("Case Study", html)
         self.assertIn("https://github.com/AshelyJT/Personal--Assistant-Bot", html)
         self.assertIn("https://creatificant.netlify.app/", html)
-        self.assertIn("https://codegenius-engineers.netlify.app/", html)
+        self.assertIn("https://codegenius.engineer/", html)
         self.assertIn("<title>Takudzwa Ashely John | Graduate Computer Systems Engineer</title>", html)
         self.assertIn('property="og:title"', html)
         self.assertIn('property="og:description"', html)
@@ -342,7 +342,7 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertEqual(payload["intent"], "projects")
         self.assertIn("CodeGenius Engineers Website", payload["response"])
         self.assertIn("project contributor", payload["response"].lower())
-        self.assertIn("https://codegenius-engineers.netlify.app/", payload["response"])
+        self.assertIn("https://codegenius.engineer/", payload["response"])
 
     def test_codegenius_affiliation_is_not_presented_as_employment(self):
         response = self.post_chat("Are you part of CodeGenius Engineers Group?")
@@ -355,7 +355,7 @@ class ChatEndpointTestCase(unittest.TestCase):
         self.assertIn("available for full-time graduate opportunities", payload["response"].lower())
         self.assertIn("Translate business and project requirements", payload["response"])
         self.assertIn("HTML, CSS, JavaScript", payload["response"])
-        self.assertIn("https://codegenius-engineers.netlify.app/", payload["response"])
+        self.assertIn("https://codegenius.engineer/", payload["response"])
 
     def test_codegenius_contribution_question_uses_collaboration_knowledge(self):
         response = self.post_chat("What did you do with CodeGenius?")
